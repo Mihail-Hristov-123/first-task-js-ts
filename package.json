@@ -15,7 +15,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "npx prettier . --write",
+    "start": "npx tsc && node dist/index.js"
   },
   "dependencies": {
     "typeorm": "^0.3.27",
