@@ -19,10 +19,8 @@ const AppDataSource = new DataSource({
 export const connectToDatabase = async () => {
     try {
         await AppDataSource.initialize()
-        console.log('COnnected')
+        console.log(`Successfully connected to DB`)
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
-
-// to be continued
