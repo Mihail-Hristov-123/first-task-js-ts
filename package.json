@@ -1,0 +1,24 @@
+{
+  "name": "task-one",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Mihail-Hristov-123/first-task-js-ts#readme",
+  "bugs": {
+    "url": "https://github.com/Mihail-Hristov-123/first-task-js-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mihail-Hristov-123/first-task-js-ts.git"
+  },
+  "license": "ISC",
+  "author": "Mihail Hristov",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.27",
+    "typescript": "^5.9.2"
+  }
+}
