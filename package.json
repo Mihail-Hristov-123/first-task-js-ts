@@ -12,17 +12,19 @@
   },
   "license": "ISC",
   "author": "Mihail Hristov",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "format": "npx prettier . --write",
     "start": "npx tsc && node dist/index.js"
   },
   "dependencies": {
+    "dotenv": "^17.2.2",
     "typeorm": "^0.3.27",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
+    "@types/node": "^24.5.2",
     "prettier": "3.6.2"
   }
 }
