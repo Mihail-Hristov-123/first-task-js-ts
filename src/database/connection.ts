@@ -1,19 +1,18 @@
 import 'dotenv/config'
 import { DataSource } from 'typeorm'
 
-const dbConnectionString = process.env.DB_PASS
+const DB_CONNECTION_STRING = process.env.DB_PASS
 
-if (!dbConnectionString) {
+if (!DB_CONNECTION_STRING) {
     throw new Error('Env credentials missing')
 }
 
 const AppDataSource = new DataSource({
     type: 'postgres',
-    url: dbConnectionString,
+    url: DB_CONNECTION_STRING,
     ssl: true,
-    entities: [
-        /*list of entities*/
-    ],
+    synchronize: true,
+    entities: [],
 })
 
 export const connectToDatabase = async () => {
@@ -21,6 +20,6 @@ export const connectToDatabase = async () => {
         await AppDataSource.initialize()
         console.log(`Successfully connected to DB`)
     } catch (error) {
-        console.error(error)
+        console.error(`Failed to connect to the database: ${error}`)
     }
 }
