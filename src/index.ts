@@ -1,6 +1,12 @@
-import { connectToDatabase } from './database/connection.js'
-import { fetchProducts } from './database/population.js'
+class Store {
+    static #instance: Store
 
-await connectToDatabase()
+    private constructor() {}
 
-await fetchProducts()
+    public static get instance() {
+        if (!Store.#instance) {
+            Store.#instance = new Store()
+        }
+        return Store.#instance
+    }
+}
