@@ -21,13 +21,19 @@ class Store {
     static async refreshProducts() {
         try {
             const newProducts = await fetchProducts()
-            const storeRepo = AppDataSource.getRepository(Product)
+            const productRepo = AppDataSource.getRepository(Product)
             for (const article of newProducts) {
-                await storeRepo.create({ ...article })
-                console.log(`Article with id ${article.id} added to the DB.`)
+                const newArticle = new Product()
+                newArticle.description = article.description
+                newArticle.name = article.title
+                newArticle.price = article.price
+                await productRepo.save(newArticle)
             }
         } catch (error) {
-            console.error(`Product update failed: ${error}`)
+            console.error(error)
         }
     }
 }
+
+await Store.establishConnection()
+await Store.refreshProducts()

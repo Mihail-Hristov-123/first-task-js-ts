@@ -13,7 +13,6 @@ export const AppDataSource = new DataSource({
     url: DB_CONNECTION_STRING,
     ssl: true,
     synchronize: true,
-    logging: true,
     entities: [Product],
 })
 
