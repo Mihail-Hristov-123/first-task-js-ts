@@ -1,3 +1,5 @@
+import { connectToDatabase } from './database/connection.js'
+
 class Store {
     static #instance: Store
 
@@ -10,3 +12,5 @@ class Store {
         return Store.#instance
     }
 }
+
+await connectToDatabase()
