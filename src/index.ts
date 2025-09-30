@@ -1,9 +1,12 @@
-import { connectToDatabase } from './database/connection.js'
+import { AppDataSource, connectToDatabase } from './database/connection.js'
+import { Customer, PremiumCustomer } from './database/entity/Customer.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
-import { repository } from './database/repository.js'
+
 import { quantityGenerator } from './helpers/quantityGenerator.js'
 
+export const customerRepo = AppDataSource.getRepository(Customer)
+export const productRepo = AppDataSource.getRepository(Product)
 class Store {
     static #instance: Store
 
@@ -34,7 +37,7 @@ class Store {
                 )
                 productsToInitialize.push(newArticle)
             }
-            await repository.product.insert(productsToInitialize)
+            await productRepo.insert(productsToInitialize)
             console.log(
                 `${productsToInitialize.length} products have been added to the store`,
             )
@@ -45,10 +48,14 @@ class Store {
 
     static async removeAllProducts() {
         try {
-            await repository.customer.clear()
+            await customerRepo.clear()
             console.log('All products have been removed - the store is empty')
         } catch (error) {
             console.error(`Error occurred during product removal: ${error}`)
         }
     }
 }
+
+await Store.establishConnection()
+const joe = new PremiumCustomer('Josh WIlliams', 1000)
+await customerRepo.save(joe)

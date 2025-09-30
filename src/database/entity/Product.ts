@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { AppDataSource } from '../connection.js'
 
 @Entity('product')
 export class Product {
@@ -14,7 +15,7 @@ export class Product {
     @Column('real')
     price: number
 
-    @Column()
+    @Column({ nullable: true })
     quantityInStock: number
 
     constructor(
@@ -31,5 +32,9 @@ export class Product {
 
     isProduct(potentialProduct: unknown): potentialProduct is Product {
         return potentialProduct instanceof Product
+    }
+
+    isAvailable() {
+        return this.quantityInStock > 0
     }
 }
