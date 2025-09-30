@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { DataSource } from 'typeorm'
-import { Product } from './entity/Product.js'
+import { Product, Customer } from './entity/index.js'
 
 const DB_CONNECTION_STRING = process.env.DB_PASS
 
@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
     url: DB_CONNECTION_STRING,
     ssl: true,
     synchronize: true,
-    entities: [Product],
+    entities: [Product, Customer],
 })
 
 export const connectToDatabase = async () => {
