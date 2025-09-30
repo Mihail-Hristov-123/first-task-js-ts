@@ -3,6 +3,7 @@ import { PremiumCustomer } from './database/entity/Customer.js'
 import { Customer, Order, Product } from './database/entity/index.js'
 import { fetchProducts } from './database/population.js'
 import { quantityGenerator } from './helpers/quantityGenerator.js'
+import { simulatePayment } from './helpers/simulatePayment.js'
 
 const customerRepo = AppDataSource.getRepository(Customer)
 const productRepo = AppDataSource.getRepository(Product)
@@ -56,7 +57,5 @@ class Store {
         }
     }
 }
-
-await Store.establishConnection()
 
 export { orderRepo, customerRepo, productRepo }
