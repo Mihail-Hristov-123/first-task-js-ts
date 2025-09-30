@@ -1,6 +1,13 @@
-import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+    ChildEntity,
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 
 import { productRepo } from '../../index.js'
+import { Order } from './Order.js'
 
 @Entity()
 abstract class Customer {
@@ -50,45 +57,12 @@ abstract class Customer {
         )
     }
 
-    // async buyProduct(productId: number) {
-    //     // Decreases the available quantity of a particular product
-    //     try {
-    //         const product = await productRepo.findOneBy({
-    //             id: productId,
-    //         })
+    @OneToMany(() => Order, (order) => order.owner)
+    orders: Order[]
 
-    //         if (!product) {
-    //             throw new Error('No product was found with the particular ID')
-    //         }
-
-    //         if (!product.isAvailable()) {
-    //             console.log(
-    //                 'Currently this product is unavailable. You will be notified once it is restocked',
-    //             )
-    //             return
-    //         }
-    //         const currentQunatity = product.quantityInStock
-
-    //         if (currentQunatity < 10 && !this.hasPriority) {
-    //             console.log(
-    //                 `As there are only ${currentQunatity} articles of this type left, they are reserved for our premium customers`,
-    //             )
-    //             return
-    //         }
-
-    //         if (this.balance < product.price) {
-    //             console.log('Insufficient funds')
-    //             return
-    //         }
-
-    //         product.quantityInStock = currentQunatity - 1
-    //         await productRepo.save(product)
-    //         this.balance -= product.price
-    //         console.log(`${product.name} purchased successfully`)
-    //     } catch (error) {
-    //         console.error(`An error occurred during the purchase: ${error}`)
-    //     }
-    // }
+    placeOrder() {
+        const newOrder = new Order(this.cart, this.id)
+    }
 
     public constructor(
         name: string,
