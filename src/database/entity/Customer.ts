@@ -57,13 +57,14 @@ abstract class Customer {
         )
     }
 
-    @OneToMany(() => Order, (order) => order.owner)
-    orders: Order[]
+    @Column('int', { array: true })
+    orderIds: number[]
 
     async placeOrder() {
         const newOrder = new Order(this.cart, this.id)
         try {
-            await orderRepo.save(newOrder)
+            const result = await orderRepo.save(newOrder)
+            this.orderIds.push(result.id)
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
@@ -84,6 +85,7 @@ abstract class Customer {
         this.hasPriority = hasPriority
         this.balance = balance
         this.cart = []
+        this.orderIds = []
     }
 }
 

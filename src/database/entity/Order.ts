@@ -1,5 +1,6 @@
 import {
     AfterInsert,
+    BeforeInsert,
     Column,
     Entity,
     JoinColumn,
@@ -25,8 +26,8 @@ export class Order {
     @Column('real', { nullable: true })
     private total: number
 
-    @ManyToOne(() => Customer, (customer) => customer.orders)
-    owner: number
+    @Column()
+    ownerId: number
 
     get status() {
         return this._status
@@ -36,7 +37,7 @@ export class Order {
         this._status = newStatus
     }
 
-    @AfterInsert()
+    @BeforeInsert()
     async setTotal() {
         let total = 0
         for (const itemId of this.cartItemIds) {
@@ -49,12 +50,11 @@ export class Order {
             total += productInfo.price
         }
         this.total = total
-        orderRepo.save(this)
     }
 
-    constructor(cartItemIds: number[], owner: number) {
+    constructor(cartItemIds: number[], ownerId: number) {
         this.cartItemIds = cartItemIds
-        this.owner = owner
+        this.ownerId = ownerId
         this._status = 'pending'
     }
     *[Symbol.iterator]() {
