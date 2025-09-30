@@ -4,6 +4,7 @@ import { customerRepo, orderRepo, productRepo } from '../../index.js'
 import { Order } from './Order.js'
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import { completeOrders } from '../../utils/completeOrders.js'
+import { cartService } from '../services/CartService.js'
 
 @Entity()
 abstract class Customer {
@@ -23,7 +24,7 @@ abstract class Customer {
     private balance: number
 
     @Column('int', { array: true })
-    private cart: number[]
+    cart: number[]
 
     @Column('int', { array: true })
     orderIds: number[]
@@ -46,31 +47,10 @@ abstract class Customer {
     }
 
     async addToCart(productId: number) {
-        try {
-            const productExists = await productRepo.findOneBy({ id: productId })
-            if (!productExists)
-                throw new Error(`Product with ID ${productId} was not found`)
-            this.cart.push(productId)
-            console.log(
-                `Product with ID ${productId} was added to ${this.name}'s cart`,
-            )
-        } catch (error) {
-            console.error(
-                `Error occurred while adding product to cart: ${error}`,
-            )
-        }
+        await cartService.addToCart(productId, this)
     }
     removeFromCart(productId: number) {
-        const productIndex = this.cart.indexOf(productId)
-        if (productIndex === -1) {
-            console.log(
-                `Product with id ${productId} was not in ${this.name}'s cart`,
-            )
-        }
-        this.cart.splice(productIndex, 1)
-        console.log(
-            `Product with id ${productId} was successfully removed from ${this.name}'s cart`,
-        )
+        cartService.removeFromCart(productId, this)
     }
 
     async placeOrder() {
