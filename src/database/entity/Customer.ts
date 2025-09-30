@@ -1,6 +1,9 @@
 import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-import { productRepo } from '../../index.js'
+import { customerRepo, orderRepo, productRepo } from '../../index.js'
+import { Order } from './Order.js'
+import { simulatePayment } from '../../utils/simulatePayment.js'
+import { completeOrders } from '../../utils/completeOrders.js'
 
 @Entity()
 abstract class Customer {
@@ -21,6 +24,26 @@ abstract class Customer {
 
     @Column('int', { array: true })
     private cart: number[]
+
+    @Column('int', { array: true })
+    orderIds: number[]
+
+    public constructor(
+        name: string,
+        hasDiscounts: boolean,
+        hasPriority: boolean,
+        balance: number,
+    ) {
+        if (balance < 0 || balance > 100_000) {
+            throw new Error('Invalid balance')
+        }
+        this.name = name
+        this.hasDiscounts = hasDiscounts
+        this.hasPriority = hasPriority
+        this.balance = balance
+        this.cart = []
+        this.orderIds = []
+    }
 
     async addToCart(productId: number) {
         try {
@@ -50,60 +73,43 @@ abstract class Customer {
         )
     }
 
-    // async buyProduct(productId: number) {
-    //     // Decreases the available quantity of a particular product
-    //     try {
-    //         const product = await productRepo.findOneBy({
-    //             id: productId,
-    //         })
-
-    //         if (!product) {
-    //             throw new Error('No product was found with the particular ID')
-    //         }
-
-    //         if (!product.isAvailable()) {
-    //             console.log(
-    //                 'Currently this product is unavailable. You will be notified once it is restocked',
-    //             )
-    //             return
-    //         }
-    //         const currentQunatity = product.quantityInStock
-
-    //         if (currentQunatity < 10 && !this.hasPriority) {
-    //             console.log(
-    //                 `As there are only ${currentQunatity} articles of this type left, they are reserved for our premium customers`,
-    //             )
-    //             return
-    //         }
-
-    //         if (this.balance < product.price) {
-    //             console.log('Insufficient funds')
-    //             return
-    //         }
-
-    //         product.quantityInStock = currentQunatity - 1
-    //         await productRepo.save(product)
-    //         this.balance -= product.price
-    //         console.log(`${product.name} purchased successfully`)
-    //     } catch (error) {
-    //         console.error(`An error occurred during the purchase: ${error}`)
-    //     }
-    // }
-
-    public constructor(
-        name: string,
-        hasDiscounts: boolean,
-        hasPriority: boolean,
-        balance: number,
-    ) {
-        if (balance < 0 || balance > 100_000) {
-            throw new Error('Invalid balance')
+    async placeOrder() {
+        const newOrder = new Order(this.cart, this.id)
+        try {
+            const result = await orderRepo.save(newOrder)
+            this.orderIds.push(result.id)
+            customerRepo.save(this)
+            console.log('Order placed')
+        } catch (error) {
+            console.log(`Order placement failed: ${error}`)
         }
-        this.name = name
-        this.hasDiscounts = hasDiscounts
-        this.hasPriority = hasPriority
-        this.balance = balance
-        this.cart = []
+    }
+
+    async payAllOrders() {
+        try {
+            const [allUserOrders, orderCount] = await orderRepo.findAndCountBy({
+                ownerId: this.id,
+            })
+            if (!orderCount) {
+                console.log(
+                    `User ${this.name} has no active orders at this moment`,
+                )
+                return
+            }
+
+            const ordersTotal = allUserOrders.reduce(
+                (sum: number, order) => (sum += order.total),
+                0,
+            )
+
+            console.log(await simulatePayment(this.balance, ordersTotal))
+            this.balance -= ordersTotal
+            await completeOrders(allUserOrders)
+            customerRepo.save(this)
+            console.log(`User ${this.name} has paid for all their orders`)
+        } catch (error) {
+            console.error(`Error occurred during payment: ${error}`)
+        }
     }
 }
 

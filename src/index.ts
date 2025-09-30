@@ -1,12 +1,14 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import { Customer } from './database/entity/Customer.js'
-import { Product } from './database/entity/Product.js'
+import { PremiumCustomer } from './database/entity/Customer.js'
+
+import { Customer, Order, Product } from './database/entity/index.js'
 import { fetchProducts } from './database/population.js'
+import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
 
-import { quantityGenerator } from './helpers/quantityGenerator.js'
+const customerRepo = AppDataSource.getRepository(Customer)
+const productRepo = AppDataSource.getRepository(Product)
+const orderRepo = AppDataSource.getRepository(Order)
 
-export const customerRepo = AppDataSource.getRepository(Customer)
-export const productRepo = AppDataSource.getRepository(Product)
 class Store {
     static #instance: Store
 
@@ -33,7 +35,7 @@ class Store {
                     name,
                     description,
                     price,
-                    quantityGenerator(),
+                    generateRandomQuantity(),
                 )
                 productsToInitialize.push(newArticle)
             }
@@ -57,3 +59,13 @@ class Store {
 }
 
 await Store.establishConnection()
+const michael = new PremiumCustomer('Michael', 200)
+
+michael.addToCart(89)
+michael.addToCart(90)
+
+await customerRepo.save(michael)
+await michael.placeOrder()
+await michael.payAllOrders()
+
+export { orderRepo, customerRepo, productRepo }
