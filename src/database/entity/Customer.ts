@@ -1,15 +1,9 @@
-import {
-    ChildEntity,
-    Column,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-} from 'typeorm'
+import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 import { customerRepo, orderRepo, productRepo } from '../../index.js'
 import { Order } from './Order.js'
-import { simulatePayment } from '../../helpers/simulatePayment.js'
-import { completeOrders } from '../../helpers/completeOrders.js'
+import { simulatePayment } from '../../utils/simulatePayment.js'
+import { completeOrders } from '../../utils/completeOrders.js'
 
 @Entity()
 abstract class Customer {

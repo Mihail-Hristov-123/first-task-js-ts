@@ -1,14 +1,5 @@
-import {
-    AfterInsert,
-    BeforeInsert,
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm'
-import { Customer } from './Customer.js'
-import { orderRepo, productRepo } from '../../index.js'
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { productRepo } from '../../index.js'
 
 type Status = 'pending' | 'complete'
 

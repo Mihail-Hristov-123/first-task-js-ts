@@ -3,7 +3,7 @@ import { PremiumCustomer } from './database/entity/Customer.js'
 
 import { Customer, Order, Product } from './database/entity/index.js'
 import { fetchProducts } from './database/population.js'
-import { generateRandomQuantity } from './helpers/generateRandomQuantity.js'
+import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
 
 const customerRepo = AppDataSource.getRepository(Customer)
 const productRepo = AppDataSource.getRepository(Product)
