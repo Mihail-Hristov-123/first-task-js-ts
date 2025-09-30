@@ -1,4 +1,4 @@
-import { AppDataSource, connectToDatabase } from './database/connection.js'
+import { connectToDatabase } from './database/connection.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
 import { productRepo } from './database/repository.js'
@@ -19,24 +19,21 @@ class Store {
         await connectToDatabase()
     }
 
-    static async refreshProducts() {
+    static async initializeProducts() {
         try {
             const newProducts = await fetchProducts()
-            let productAddedCount = 0
+            const productsToInitialize: Product[] = []
             for (const article of newProducts) {
                 const { description, title: name, price } = article
-                const newArticle = new Product()
-                newArticle.description = description
-                newArticle.name = name
-                newArticle.price = price
-                await productRepo.save(newArticle)
-                productAddedCount++
+                const newArticle = new Product(name, description, price)
+                productsToInitialize.push(newArticle)
             }
+            await productRepo.insert(productsToInitialize)
             console.log(
-                `${productAddedCount} products have been added to the store`,
+                `${productsToInitialize.length} products have been added to the store`,
             )
         } catch (error) {
-            console.error(error)
+            console.error(`Products initialization error: ${error}`)
         }
     }
 
