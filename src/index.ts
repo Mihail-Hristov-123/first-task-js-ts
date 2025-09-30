@@ -58,10 +58,13 @@ class Store {
 }
 
 await Store.establishConnection()
-const userOne = new PremiumCustomer('Mihail', 1000)
-await customerRepo.save(userOne)
-userOne.addToCart(97)
-await userOne.placeOrder()
-await customerRepo.save(userOne)
-
+// const george = new PremiumCustomer('George', 2000)
+// george.addToCart(91)
+// george.addToCart(92)
+// await george.placeOrder()
+// const order = await orderRepo.findOneBy({ id: 3 })
+// console.log(order)
+// for (let element of order!) {
+//     console.log(element)
+// }
 export { orderRepo, customerRepo, productRepo }

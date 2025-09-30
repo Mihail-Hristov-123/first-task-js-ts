@@ -25,4 +25,9 @@ export class Order {
         this.owner = owner
         this.status = 'pending'
     }
+    *[Symbol.iterator]() {
+        for (const item of this.cartItemIds) {
+            yield item
+        }
+    }
 }
