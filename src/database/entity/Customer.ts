@@ -1,10 +1,6 @@
 import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-
-import { customerRepo, orderRepo, productRepo } from '../../index.js'
-import { Order } from './Order.js'
-import { simulatePayment } from '../../utils/simulatePayment.js'
-import { completeOrders } from '../../utils/completeOrders.js'
 import { cartService } from '../services/CartService.js'
+import { orderService } from '../services/OrderServce.js'
 
 @Entity()
 abstract class Customer {
@@ -21,7 +17,7 @@ abstract class Customer {
     readonly hasPriority: boolean
 
     @Column('real')
-    private balance: number
+    balance: number
 
     @Column('int', { array: true })
     cart: number[]
@@ -54,42 +50,11 @@ abstract class Customer {
     }
 
     async placeOrder() {
-        const newOrder = new Order(this.cart, this.id)
-        try {
-            const result = await orderRepo.save(newOrder)
-            this.orderIds.push(result.id)
-            customerRepo.save(this)
-            console.log('Order placed')
-        } catch (error) {
-            console.log(`Order placement failed: ${error}`)
-        }
+        await orderService.placeOrder(this)
     }
 
     async payAllOrders() {
-        try {
-            const [allUserOrders, orderCount] = await orderRepo.findAndCountBy({
-                ownerId: this.id,
-            })
-            if (!orderCount) {
-                console.log(
-                    `User ${this.name} has no active orders at this moment`,
-                )
-                return
-            }
-
-            const ordersTotal = allUserOrders.reduce(
-                (sum: number, order) => (sum += order.total),
-                0,
-            )
-
-            console.log(await simulatePayment(this.balance, ordersTotal))
-            this.balance -= ordersTotal
-            await completeOrders(allUserOrders)
-            customerRepo.save(this)
-            console.log(`User ${this.name} has paid for all their orders`)
-        } catch (error) {
-            console.error(`Error occurred during payment: ${error}`)
-        }
+        await orderService.payAllOrders(this)
     }
 }
 
