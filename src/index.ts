@@ -1,6 +1,7 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
+import { productRepo } from './database/repository.js'
 
 class Store {
     static #instance: Store
@@ -21,19 +22,30 @@ class Store {
     static async refreshProducts() {
         try {
             const newProducts = await fetchProducts()
-            const productRepo = AppDataSource.getRepository(Product)
+            let productAddedCount = 0
             for (const article of newProducts) {
+                const { description, title: name, price } = article
                 const newArticle = new Product()
-                newArticle.description = article.description
-                newArticle.name = article.title
-                newArticle.price = article.price
+                newArticle.description = description
+                newArticle.name = name
+                newArticle.price = price
                 await productRepo.save(newArticle)
+                productAddedCount++
             }
+            console.log(
+                `${productAddedCount} products have been added to the store`,
+            )
         } catch (error) {
             console.error(error)
         }
     }
-}
 
-await Store.establishConnection()
-await Store.refreshProducts()
+    static async removeAllProducts() {
+        try {
+            await productRepo.clear()
+            console.log('All products have been removed - the store is empty')
+        } catch (error) {
+            console.error(`Error occurred during product removal: ${error}`)
+        }
+    }
+}
