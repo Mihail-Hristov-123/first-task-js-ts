@@ -1,7 +1,7 @@
 import { connectToDatabase } from './database/connection.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
-import { productRepo } from './database/repository.js'
+import { repository } from './database/repository.js'
 
 class Store {
     static #instance: Store
@@ -28,7 +28,7 @@ class Store {
                 const newArticle = new Product(name, description, price)
                 productsToInitialize.push(newArticle)
             }
-            await productRepo.insert(productsToInitialize)
+            await repository.product.insert(productsToInitialize)
             console.log(
                 `${productsToInitialize.length} products have been added to the store`,
             )
@@ -39,7 +39,7 @@ class Store {
 
     static async removeAllProducts() {
         try {
-            await productRepo.clear()
+            await repository.customer.clear()
             console.log('All products have been removed - the store is empty')
         } catch (error) {
             console.error(`Error occurred during product removal: ${error}`)

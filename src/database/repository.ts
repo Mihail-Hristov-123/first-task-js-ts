@@ -1,4 +1,6 @@
 import { AppDataSource } from './connection.js'
-import { Product } from './entity/Product.js'
+import { Customer, Product } from './entity/index.js'
 
-export const productRepo = AppDataSource.getRepository(Product)
+const product = AppDataSource.getRepository(Product)
+const customer = AppDataSource.getRepository(Customer)
+export const repository = { product, customer }
