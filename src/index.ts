@@ -1,5 +1,5 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import { Customer, PremiumCustomer } from './database/entity/Customer.js'
+import { Customer } from './database/entity/Customer.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
 
@@ -48,7 +48,7 @@ class Store {
 
     static async removeAllProducts() {
         try {
-            await customerRepo.clear()
+            await productRepo.clear()
             console.log('All products have been removed - the store is empty')
         } catch (error) {
             console.error(`Error occurred during product removal: ${error}`)
@@ -57,5 +57,3 @@ class Store {
 }
 
 await Store.establishConnection()
-const joe = new PremiumCustomer('Josh WIlliams', 1000)
-await customerRepo.save(joe)

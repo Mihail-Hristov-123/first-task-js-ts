@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { AppDataSource } from '../connection.js'
 
 @Entity('product')
 export class Product {
@@ -36,5 +35,14 @@ export class Product {
 
     isAvailable() {
         return this.quantityInStock > 0
+    }
+
+    decreaseQuantity() {
+        if (this.quantityInStock === 0) {
+            console.log(
+                'Product is currently unavailable, its quantity cannot be further decreased',
+            )
+        }
+        this.quantityInStock -= 1
     }
 }
