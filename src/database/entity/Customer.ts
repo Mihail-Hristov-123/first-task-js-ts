@@ -6,7 +6,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm'
 
-import { productRepo } from '../../index.js'
+import { orderRepo, productRepo } from '../../index.js'
 import { Order } from './Order.js'
 
 @Entity()
@@ -60,8 +60,14 @@ abstract class Customer {
     @OneToMany(() => Order, (order) => order.owner)
     orders: Order[]
 
-    placeOrder() {
+    async placeOrder() {
         const newOrder = new Order(this.cart, this.id)
+        try {
+            await orderRepo.save(newOrder)
+            console.log('Order placed')
+        } catch (error) {
+            console.log(`Order placement failed: ${error}`)
+        }
     }
 
     public constructor(
