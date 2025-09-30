@@ -9,6 +9,7 @@ import {
 import { customerRepo, orderRepo, productRepo } from '../../index.js'
 import { Order } from './Order.js'
 import { simulatePayment } from '../../helpers/simulatePayment.js'
+import { completeOrders } from '../../helpers/completeOrders.js'
 
 @Entity()
 abstract class Customer {
@@ -109,9 +110,9 @@ abstract class Customer {
 
             console.log(await simulatePayment(this.balance, ordersTotal))
             this.balance -= ordersTotal
+            await completeOrders(allUserOrders)
             customerRepo.save(this)
-
-            // continue by chnging orders status
+            console.log(`User ${this.name} has paid for all their orders`)
         } catch (error) {
             console.error(`Error occurred during payment: ${error}`)
         }
