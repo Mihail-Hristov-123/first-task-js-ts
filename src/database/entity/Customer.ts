@@ -6,8 +6,9 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm'
 
-import { orderRepo, productRepo } from '../../index.js'
+import { customerRepo, orderRepo, productRepo } from '../../index.js'
 import { Order } from './Order.js'
+import { simulatePayment } from '../../helpers/simulatePayment.js'
 
 @Entity()
 abstract class Customer {
@@ -28,6 +29,26 @@ abstract class Customer {
 
     @Column('int', { array: true })
     private cart: number[]
+
+    @Column('int', { array: true })
+    orderIds: number[]
+
+    public constructor(
+        name: string,
+        hasDiscounts: boolean,
+        hasPriority: boolean,
+        balance: number,
+    ) {
+        if (balance < 0 || balance > 100_000) {
+            throw new Error('Invalid balance')
+        }
+        this.name = name
+        this.hasDiscounts = hasDiscounts
+        this.hasPriority = hasPriority
+        this.balance = balance
+        this.cart = []
+        this.orderIds = []
+    }
 
     async addToCart(productId: number) {
         try {
@@ -57,35 +78,43 @@ abstract class Customer {
         )
     }
 
-    @Column('int', { array: true })
-    orderIds: number[]
-
     async placeOrder() {
         const newOrder = new Order(this.cart, this.id)
         try {
             const result = await orderRepo.save(newOrder)
             this.orderIds.push(result.id)
+            customerRepo.save(this)
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
         }
     }
 
-    public constructor(
-        name: string,
-        hasDiscounts: boolean,
-        hasPriority: boolean,
-        balance: number,
-    ) {
-        if (balance < 0 || balance > 100_000) {
-            throw new Error('Invalid balance')
+    async payAllOrders() {
+        try {
+            const [allUserOrders, orderCount] = await orderRepo.findAndCountBy({
+                ownerId: this.id,
+            })
+            if (!orderCount) {
+                console.log(
+                    `User ${this.name} has no active orders at this moment`,
+                )
+                return
+            }
+
+            const ordersTotal = allUserOrders.reduce(
+                (sum: number, order) => (sum += order.total),
+                0,
+            )
+
+            console.log(await simulatePayment(this.balance, ordersTotal))
+            this.balance -= ordersTotal
+            customerRepo.save(this)
+
+            // continue by chnging orders status
+        } catch (error) {
+            console.error(`Error occurred during payment: ${error}`)
         }
-        this.name = name
-        this.hasDiscounts = hasDiscounts
-        this.hasPriority = hasPriority
-        this.balance = balance
-        this.cart = []
-        this.orderIds = []
     }
 }
 

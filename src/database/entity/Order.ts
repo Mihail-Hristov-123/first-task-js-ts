@@ -24,7 +24,7 @@ export class Order {
     private _status: Status
 
     @Column('real', { nullable: true })
-    private total: number
+    total: number
 
     @Column()
     ownerId: number
