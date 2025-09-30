@@ -1,5 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+    AfterInsert,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 import { Customer } from './Customer.js'
+import { orderRepo, productRepo } from '../../index.js'
 
 type Status = 'pending' | 'complete'
 
@@ -12,18 +20,42 @@ export class Order {
     private cartItemIds: number[]
 
     @Column()
-    status: Status
+    private _status: Status
 
     @Column('real', { nullable: true })
     private total: number
 
     @ManyToOne(() => Customer, (customer) => customer.orders)
-    readonly owner: number
+    owner: number
+
+    get status() {
+        return this._status
+    }
+
+    set status(newStatus: Status) {
+        this._status = newStatus
+    }
+
+    @AfterInsert()
+    async setTotal() {
+        let total = 0
+        for (const itemId of this.cartItemIds) {
+            let productInfo = await productRepo.findOneBy({ id: itemId })
+            if (!productInfo) {
+                throw new Error(
+                    `Couldn't find any info for product with ID ${itemId} - order total was not calculated`,
+                )
+            }
+            total += productInfo.price
+        }
+        this.total = total
+        orderRepo.save(this)
+    }
 
     constructor(cartItemIds: number[], owner: number) {
         this.cartItemIds = cartItemIds
         this.owner = owner
-        this.status = 'pending'
+        this._status = 'pending'
     }
     *[Symbol.iterator]() {
         for (const item of this.cartItemIds) {
