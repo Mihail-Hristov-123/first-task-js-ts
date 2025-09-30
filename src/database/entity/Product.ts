@@ -14,10 +14,19 @@ export class Product {
     @Column('real')
     price: number
 
-    constructor(name: string, description: string, price: number) {
+    @Column()
+    quantityInStock: number
+
+    constructor(
+        name: string,
+        description: string,
+        price: number,
+        quantityInStock: number,
+    ) {
         this.name = name
         this.description = description
         this.price = price
+        this.quantityInStock = quantityInStock
     }
 
     isProduct(potentialProduct: unknown): potentialProduct is Product {

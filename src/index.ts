@@ -2,6 +2,7 @@ import { connectToDatabase } from './database/connection.js'
 import { Product } from './database/entity/Product.js'
 import { fetchProducts } from './database/population.js'
 import { repository } from './database/repository.js'
+import { quantityGenerator } from './helpers/quantityGenerator.js'
 
 class Store {
     static #instance: Store
@@ -25,7 +26,12 @@ class Store {
             const productsToInitialize: Product[] = []
             for (const article of newProducts) {
                 const { description, title: name, price } = article
-                const newArticle = new Product(name, description, price)
+                const newArticle = new Product(
+                    name,
+                    description,
+                    price,
+                    quantityGenerator(),
+                )
                 productsToInitialize.push(newArticle)
             }
             await repository.product.insert(productsToInitialize)
