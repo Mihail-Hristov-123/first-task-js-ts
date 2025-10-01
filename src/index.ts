@@ -59,7 +59,7 @@ class Store {
 }
 
 await Store.establishConnection()
-const joe = new PremiumCustomer('John', 'nyyy@gmail.com', 1000)
+const joe = new PremiumCustomer('John', 'joe@gmail.com', 1000)
 joe.modifyCart('addToCart', 84)
 joe.modifyCart('addToCart', 85)
 await customerRepo.save(joe)
