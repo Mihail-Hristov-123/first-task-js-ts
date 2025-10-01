@@ -1,6 +1,12 @@
 import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { handleCartOperation, type CartOperation } from '../services/CartService.js'
-import { handleOrderOperation, type OrderOperation } from '../services/OrderServce.js'
+import {
+    handleCartOperation,
+    type CartOperation,
+} from '../services/CartService.js'
+import {
+    handleOrderOperation,
+    type OrderOperation,
+} from '../services/OrderServce.js'
 
 @Entity()
 abstract class Customer {
@@ -16,6 +22,9 @@ abstract class Customer {
     @Column({ default: false })
     readonly hasPriority: boolean
 
+    @Column({ unique: true })
+    email: string
+
     @Column('real')
     balance: number
 
@@ -27,6 +36,7 @@ abstract class Customer {
 
     public constructor(
         name: string,
+        email: string,
         hasDiscounts: boolean,
         hasPriority: boolean,
         balance: number,
@@ -35,6 +45,7 @@ abstract class Customer {
             throw new Error('Invalid balance')
         }
         this.name = name
+        this.email = email
         this.hasDiscounts = hasDiscounts
         this.hasPriority = hasPriority
         this.balance = balance
@@ -53,15 +64,15 @@ abstract class Customer {
 
 @ChildEntity()
 class RegularCustomer extends Customer {
-    constructor(name: string, balance: number) {
-        super(name, false, false, balance)
+    constructor(name: string, email: string, balance: number) {
+        super(name, email, false, false, balance)
     }
 }
 
 @ChildEntity()
 class PremiumCustomer extends Customer {
-    constructor(name: string, balance: number) {
-        super(name, true, true, balance)
+    constructor(name: string, email: string, balance: number) {
+        super(name, email, true, true, balance)
     }
 }
 

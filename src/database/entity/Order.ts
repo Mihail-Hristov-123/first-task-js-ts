@@ -9,7 +9,7 @@ export class Order {
     id: number
 
     @Column('int', { array: true })
-    private cartItemIds: number[]
+    cartItemIds: number[]
 
     @Column()
     private _status: Status
