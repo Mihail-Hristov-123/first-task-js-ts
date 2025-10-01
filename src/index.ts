@@ -12,7 +12,7 @@ const orderRepo = AppDataSource.getRepository(Order)
 class Store {
     static #instance: Store
 
-    private constructor() {}
+    private constructor() { }
 
     static get instance() {
         if (!Store.#instance) {
@@ -59,13 +59,10 @@ class Store {
 }
 
 await Store.establishConnection()
-const michael = new PremiumCustomer('Michael', 200)
-
-michael.addToCart(89)
-michael.addToCart(90)
-
-await customerRepo.save(michael)
-await michael.placeOrder()
-await michael.payAllOrders()
-
+const joe = new PremiumCustomer('John', 100)
+joe.modifyCart('addToCart', 89)
+joe.modifyCart('addToCart', 90)
+await customerRepo.save(joe)
+await joe.modifyOrder('placeOrder')
+await joe.modifyOrder('payAllOrders')
 export { orderRepo, customerRepo, productRepo }
