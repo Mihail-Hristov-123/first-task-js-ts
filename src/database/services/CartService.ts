@@ -30,4 +30,19 @@ class CartService {
         )
     }
 }
-export const cartService = new CartService()
+
+export type CartOperation = keyof CartService
+
+export const handleCartOperation = async (operation: CartOperation, customerInstance: Customer, productId: number) => {
+    const cartService = new CartService()
+    switch (operation) {
+        case 'addToCart':
+            await cartService.addToCart(productId, customerInstance)
+            break;
+        case 'removeFromCart':
+            cartService.removeFromCart(productId, customerInstance)
+            break;
+        default:
+            break;
+    }
+}

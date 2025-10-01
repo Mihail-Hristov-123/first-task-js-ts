@@ -1,6 +1,6 @@
 import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { cartService } from '../services/CartService.js'
-import { orderService } from '../services/OrderServce.js'
+import { handleCartOperation, type CartOperation } from '../services/CartService.js'
+import { handleOrderOperation, type OrderOperation } from '../services/OrderServce.js'
 
 @Entity()
 abstract class Customer {
@@ -42,19 +42,12 @@ abstract class Customer {
         this.orderIds = []
     }
 
-    async addToCart(productId: number) {
-        await cartService.addToCart(productId, this)
-    }
-    removeFromCart(productId: number) {
-        cartService.removeFromCart(productId, this)
+    async modifyCart(operation: CartOperation, productId: number) {
+        await handleCartOperation(operation, this, productId)
     }
 
-    async placeOrder() {
-        await orderService.placeOrder(this)
-    }
-
-    async payAllOrders() {
-        await orderService.payAllOrders(this)
+    async modifyOrder(operation: OrderOperation) {
+        await handleOrderOperation(operation, this)
     }
 }
 

@@ -10,7 +10,7 @@ class OrderService {
         try {
             const result = await orderRepo.save(newOrder)
             currentCustomer.orderIds.push(result.id)
-            customerRepo.save(this)
+            customerRepo.save(currentCustomer)
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
@@ -49,4 +49,24 @@ class OrderService {
     }
 }
 
-export const orderService = new OrderService()
+
+export type OrderOperation = keyof OrderService
+
+export const handleOrderOperation = async (operation: OrderOperation, customerInstance: Customer) => {
+    const orderService = new OrderService()
+    switch (operation) {
+        case 'placeOrder':
+            await orderService.placeOrder(customerInstance)
+            break;
+        case 'payAllOrders':
+            await orderService.payAllOrders(customerInstance)
+            break;
+
+        default:
+            break;
+    }
+
+
+}
+
+

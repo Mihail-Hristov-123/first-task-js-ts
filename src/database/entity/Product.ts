@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { handleProductOperation, type ProductOperation } from '../services/ProductService.js'
 
 @Entity('product')
 export class Product {
@@ -29,7 +30,7 @@ export class Product {
         this.quantityInStock = quantityInStock
     }
 
-    isProduct(potentialProduct: unknown): potentialProduct is Product {
+    static isProduct(potentialProduct: unknown): potentialProduct is Product {
         return potentialProduct instanceof Product
     }
 
@@ -37,12 +38,7 @@ export class Product {
         return this.quantityInStock > 0
     }
 
-    decreaseQuantity() {
-        if (this.quantityInStock === 0) {
-            console.log(
-                'Product is currently unavailable, its quantity cannot be further decreased',
-            )
-        }
-        this.quantityInStock -= 1
+    modifyProduct(operation: ProductOperation) {
+        handleProductOperation(operation, this)
     }
 }
