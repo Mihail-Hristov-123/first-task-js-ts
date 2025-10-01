@@ -3,11 +3,14 @@ import { limitProductAvailability } from '../../utils/limitProductAvailability.j
 import { Customer } from '../entity/Customer.js'
 
 class CartService {
-
     async addToCart(productId: number, currentCustomer: Customer) {
         try {
             const product = await productRepo.findOneBy({ id: productId })
-            limitProductAvailability(currentCustomer, productId, product || undefined)
+            limitProductAvailability(
+                currentCustomer,
+                productId,
+                product || undefined,
+            )
             currentCustomer.cart.push(productId)
             console.log(
                 `Product with ID ${productId} was added to ${currentCustomer.name}'s cart`,
@@ -36,16 +39,20 @@ class CartService {
 
 export type CartOperation = keyof CartService
 
-export const handleCartOperation = async (operation: CartOperation, customerInstance: Customer, productId: number) => {
+export const handleCartOperation = async (
+    operation: CartOperation,
+    customerInstance: Customer,
+    productId: number,
+) => {
     const cartService = new CartService()
     switch (operation) {
         case 'addToCart':
             await cartService.addToCart(productId, customerInstance)
-            break;
+            break
         case 'removeFromCart':
             cartService.removeFromCart(productId, customerInstance)
-            break;
+            break
         default:
-            break;
+            break
     }
 }

@@ -1,5 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { handleProductOperation, type ProductOperation } from '../services/ProductService.js'
+import {
+    handleProductOperation,
+    type ProductOperation,
+} from '../services/ProductService.js'
 
 @Entity('product')
 export class Product {

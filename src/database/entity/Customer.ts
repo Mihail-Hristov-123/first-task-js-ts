@@ -1,6 +1,12 @@
 import { ChildEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { handleCartOperation, type CartOperation } from '../services/CartService.js'
-import { handleOrderOperation, type OrderOperation } from '../services/OrderServce.js'
+import {
+    handleCartOperation,
+    type CartOperation,
+} from '../services/CartService.js'
+import {
+    handleOrderOperation,
+    type OrderOperation,
+} from '../services/OrderServce.js'
 
 @Entity()
 abstract class Customer {
@@ -34,7 +40,6 @@ abstract class Customer {
         hasDiscounts: boolean,
         hasPriority: boolean,
         balance: number,
-
     ) {
         if (balance < 0 || balance > 100_000) {
             throw new Error('Invalid balance')

@@ -1,4 +1,5 @@
 import { customerRepo, orderRepo } from '../../index.js'
+import { calculateTotal } from '../../utils/calculateTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import type { Customer } from '../entity/Customer.js'
@@ -18,55 +19,52 @@ class OrderService {
     }
 
     async payAllOrders(currentCustomer: Customer) {
+        const { id: customerId } = currentCustomer
         try {
             const [allUserOrders, orderCount] = await orderRepo.findAndCountBy({
-                ownerId: currentCustomer.id,
+                ownerId: customerId,
             })
             if (!orderCount) {
                 console.log(
-                    `User ${currentCustomer.name} has no active orders at this moment`,
+                    `User with ID ${customerId} has no active orders at this moment`,
                 )
                 return
             }
 
-            const ordersTotal = allUserOrders.reduce(
-                (sum: number, order) => (sum += order.total),
-                0,
+            const totalPrice = calculateTotal(
+                allUserOrders,
+                currentCustomer.hasDiscounts,
             )
 
             console.log(
-                await simulatePayment(currentCustomer.balance, ordersTotal),
+                await simulatePayment(currentCustomer.balance, totalPrice),
             )
-            currentCustomer.balance -= ordersTotal
+            currentCustomer.balance -= totalPrice
             await completeOrders(allUserOrders)
             customerRepo.save(currentCustomer)
-            console.log(
-                `User ${currentCustomer.name} has paid for all their orders`,
-            )
+            console.log(`User with ID ${customerId} has paid for all their orders`)
         } catch (error) {
             console.error(`Error occurred during payment: ${error}`)
         }
     }
 }
 
-
 export type OrderOperation = keyof OrderService
 
-export const handleOrderOperation = async (operation: OrderOperation, customerInstance: Customer) => {
+export const handleOrderOperation = async (
+    operation: OrderOperation,
+    customerInstance: Customer,
+) => {
     const orderService = new OrderService()
     switch (operation) {
         case 'placeOrder':
             await orderService.placeOrder(customerInstance)
-            break;
+            break
         case 'payAllOrders':
             await orderService.payAllOrders(customerInstance)
-            break;
+            break
 
         default:
-            break;
+            break
     }
-
-
 }
-
-
