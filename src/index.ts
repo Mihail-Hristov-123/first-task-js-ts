@@ -61,10 +61,12 @@ class Store {
 }
 
 await Store.establishConnection()
-const joe = new PremiumCustomer('new', 'j4rrsda3ashe@gmail.com', 1000)
+const joe = new PremiumCustomer('new', 'da3332ashe@gmail.com', 1000)
+await customerRepo.save(joe)
 await joe.modifyCart('addToCart', 84)
 await joe.modifyCart('addToCart', 85)
-await customerRepo.save(joe)
+
 await joe.modifyOrder('placeOrder')
+
 await joe.modifyOrder('payAllOrders')
 export { orderRepo, customerRepo, productRepo }

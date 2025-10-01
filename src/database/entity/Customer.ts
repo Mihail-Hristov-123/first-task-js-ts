@@ -32,7 +32,7 @@ abstract class Customer {
     @Column('int', { array: true })
     cart: number[]
 
-    @OneToMany(() => Order, (order) => order.owner, { cascade: true })
+    @OneToMany(() => Order, (order) => order.owner, { cascade: true, eager: true })
     orders: Order[]
 
     public constructor(

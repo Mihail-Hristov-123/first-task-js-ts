@@ -6,6 +6,7 @@ import { orderRepo } from '../index.js'
 export const completeOrders = async (orders: Order[] | Order) => {
     if (!Array.isArray(orders)) orders = [orders]
     for (const order of orders) {
+        console.log(order)
         const currentOrder = await orderRepo.findOneBy({ id: order.id })
         if (!currentOrder) {
             throw new Error(`Order with  was not found`)

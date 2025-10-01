@@ -12,6 +12,7 @@ class OrderService {
         try {
             await orderRepo.save(newOrder)
             currentCustomer.cart = []
+            customerRepo.save(currentCustomer)
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
@@ -20,11 +21,9 @@ class OrderService {
 
     async payAllOrders(currentCustomer: Customer) {
         const { id: customerId } = currentCustomer
+
         try {
-            console.log(customerId)
-            console.log(await orderRepo.find())
-            const allUserOrders = await orderRepo.findBy({ 'owner': currentCustomer })
-            console.log(allUserOrders)
+            const allUserOrders = await orderRepo.findBy({ owner: { id: currentCustomer.id } })
             if (allUserOrders.length === 0) {
                 console.log(
                     `User with ID ${customerId} has no active orders at this moment`,
@@ -36,6 +35,7 @@ class OrderService {
                 allUserOrders,
                 currentCustomer.hasDiscounts,
             )
+            console.log(allUserOrders, totalPrice)
 
             console.log(
                 await simulatePayment(currentCustomer.balance, totalPrice),
@@ -43,7 +43,7 @@ class OrderService {
             currentCustomer.balance -= totalPrice
             await completeOrders(allUserOrders)
             await reduceQuantityFromOrder(allUserOrders)
-            customerRepo.save(currentCustomer)
+            await customerRepo.save(currentCustomer)
             console.log(`User with ID ${customerId} has paid for all their orders`)
         } catch (error) {
             console.error(`Error occurred during payment: ${error}`)
