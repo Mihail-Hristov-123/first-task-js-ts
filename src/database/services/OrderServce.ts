@@ -8,11 +8,10 @@ import { Order } from '../entity/Order.js'
 
 class OrderService {
     async placeOrder(currentCustomer: Customer) {
-        const newOrder = new Order(currentCustomer.cart, currentCustomer.id)
+        const newOrder = new Order(currentCustomer.cart, currentCustomer)
         try {
-            const result = await orderRepo.save(newOrder)
-            currentCustomer.orderIds.push(result.id)
-            customerRepo.save(currentCustomer)
+            await orderRepo.save(newOrder)
+            currentCustomer.cart = []
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
@@ -22,10 +21,11 @@ class OrderService {
     async payAllOrders(currentCustomer: Customer) {
         const { id: customerId } = currentCustomer
         try {
-            const [allUserOrders, orderCount] = await orderRepo.findAndCountBy({
-                ownerId: customerId,
-            })
-            if (!orderCount) {
+            console.log(customerId)
+            console.log(await orderRepo.find())
+            const allUserOrders = await orderRepo.findBy({ 'owner': currentCustomer })
+            console.log(allUserOrders)
+            if (allUserOrders.length === 0) {
                 console.log(
                     `User with ID ${customerId} has no active orders at this moment`,
                 )

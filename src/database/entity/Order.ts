@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { productRepo } from '../../index.js'
+import { Customer } from './Customer.js'
 
 type Status = 'pending' | 'complete'
 
@@ -17,8 +18,8 @@ export class Order {
     @Column('real', { nullable: true })
     total: number
 
-    @Column()
-    ownerId: number
+    @ManyToOne(() => Customer, (customer) => customer.orders)
+    owner: Customer
 
     get status() {
         return this._status
@@ -43,9 +44,9 @@ export class Order {
         this.total = total
     }
 
-    constructor(cartItemIds: number[], ownerId: number) {
+    constructor(cartItemIds: number[], owner: Customer) {
         this.cartItemIds = cartItemIds
-        this.ownerId = ownerId
+        this.owner = owner
         this._status = 'pending'
     }
     *[Symbol.iterator]() {
