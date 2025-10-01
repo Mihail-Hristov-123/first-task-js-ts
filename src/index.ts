@@ -1,5 +1,5 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import { PremiumCustomer } from './database/entity/Customer.js'
+import { PremiumCustomer, RegularCustomer } from './database/entity/Customer.js'
 
 import { Customer, Order, Product } from './database/entity/index.js'
 import { fetchProducts } from './database/population.js'
@@ -59,7 +59,7 @@ class Store {
 }
 
 await Store.establishConnection()
-const joe = new PremiumCustomer('John', 100)
+const joe = new RegularCustomer('John', 'john@gmail.com', 1000)
 joe.modifyCart('addToCart', 89)
 joe.modifyCart('addToCart', 90)
 await customerRepo.save(joe)
