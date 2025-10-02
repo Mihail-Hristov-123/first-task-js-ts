@@ -1,4 +1,4 @@
-import { customerRepo, orderRepo, productRepo } from '../index.js'
+import { customerRepo, orderRepo, productRepo } from '../database/connection.js'
 
 export type FetchableEntities = 'customer' | 'product' | 'order'
 
@@ -14,6 +14,7 @@ const getAppropriateRepo = (query: FetchableEntities) => {
             return productRepo
 
         default:
+            console.warn(`Unhandled query type: ${query}`)
             break
     }
 }

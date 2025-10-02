@@ -1,15 +1,16 @@
-import { customerRepo, orderRepo, productRepo } from '../../index.js'
-
 import { initializeProducts } from '../../utils/initializeProducts.js'
-import { connectToDatabase } from '../connection.js'
+import { connectToDatabase, customerRepo } from '../connection.js'
 import { PremiumCustomer, RegularCustomer } from '../entity/Customer.js'
 
 class StoreService {
-    async establishConnection() {
-        await connectToDatabase()
-    }
-    async fetchProducts() {
-        await initializeProducts()
+    async initializeStore() {
+        try {
+            await connectToDatabase()
+            await initializeProducts()
+            console.log(`The store is now open and ready for new orders!`)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     async createUser(
@@ -37,16 +38,4 @@ class StoreService {
 
 const storeService = new StoreService()
 
-const initializeStore = async () => {
-    try {
-        await storeService.establishConnection()
-        await storeService.fetchProducts()
-        console.log(`The store is now open and ready for new orders!`)
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-const createUser = storeService.createUser
-
-export { createUser, initializeStore }
+export const { initializeStore, createUser } = storeService

@@ -1,5 +1,5 @@
-import { customerRepo, productRepo } from '../../index.js'
 import { limitProductAvailability } from '../../utils/limitProductAvailability.js'
+import { customerRepo } from '../connection.js'
 import { Customer } from '../entity/Customer.js'
 import type { Product } from '../entity/Product.js'
 
@@ -60,6 +60,7 @@ export const handleCartOperation = async (
             await cartService.removeFromCart(product, customerInstance)
             break
         default:
+            console.warn(`Unhandled operation type: ${operation}`)
             break
     }
 }

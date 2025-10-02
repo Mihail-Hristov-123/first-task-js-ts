@@ -1,5 +1,5 @@
 import type { Customer } from '../database/entity/Customer.js'
-import { customerRepo } from '../index.js'
+import { customerRepo } from '../database/connection.js'
 
 export const reduceBalance = async (customer: Customer, amount: number) => {
     customer.balance = customer.balance - amount

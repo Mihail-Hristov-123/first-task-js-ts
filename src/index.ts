@@ -1,6 +1,5 @@
-import { AppDataSource, connectToDatabase } from './database/connection.js'
+import { orderRepo, productRepo } from './database/connection.js'
 import { Customer } from './database/entity/Customer.js'
-import { Order } from './database/entity/Order.js'
 import { Product } from './database/entity/Product.js'
 
 import {
@@ -8,10 +7,6 @@ import {
     initializeStore,
 } from './database/services/StoreService.js'
 import { fetchInstance, type FetchableEntities } from './utils/fetchInstance.js'
-
-const customerRepo = AppDataSource.getRepository(Customer)
-const productRepo = AppDataSource.getRepository(Product)
-const orderRepo = AppDataSource.getRepository(Order)
 
 class Store {
     static #instance: Store
@@ -64,5 +59,3 @@ class Store {
 
 const store = Store.instance
 await store.openStore()
-
-export { customerRepo, productRepo, orderRepo }

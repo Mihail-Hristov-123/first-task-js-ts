@@ -1,4 +1,3 @@
-import { customerRepo, orderRepo } from '../../index.js'
 import { calculateOrderTotal } from '../../utils/calculateOrderTotal.js'
 import { calculateTotal } from '../../utils/calculateTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
@@ -6,6 +5,7 @@ import { reduceBalance } from '../../utils/reduceBalance.js'
 import { reduceProductQuantity } from '../../utils/reduceProductQuantity.js'
 
 import { simulatePayment } from '../../utils/simulatePayment.js'
+import { customerRepo, orderRepo } from '../connection.js'
 import type { Customer } from '../entity/Customer.js'
 import { Order } from '../entity/Order.js'
 
@@ -93,6 +93,7 @@ export const handleOrderOperation = async (
             break
 
         default:
+            console.warn(`Unhandled operation type: ${operation}`)
             break
     }
 }

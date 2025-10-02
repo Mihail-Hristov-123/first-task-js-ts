@@ -1,6 +1,6 @@
 import { Product } from '../database/entity/Product.js'
 import { fetchProducts } from '../database/population.js'
-import { productRepo } from '../index.js'
+import { productRepo } from '../database/connection.js'
 
 import { generateRandomQuantity } from './generateRandomQuantity.js'
 

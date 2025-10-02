@@ -1,5 +1,5 @@
 import type { Order } from '../database/entity/Order.js'
-import { orderRepo } from '../index.js'
+import { orderRepo } from '../database/connection.js'
 
 export const completeOrders = async (orders: Order[]) => {
     for (const currentOrder of orders) {

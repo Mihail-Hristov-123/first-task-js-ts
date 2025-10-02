@@ -71,6 +71,12 @@ abstract class Customer {
     async modifyOrder(operation: OrderOperation) {
         await handleOrderOperation(operation, this)
     }
+
+    *[Symbol.iterator]() {
+        for (const item of this.cart) {
+            yield item
+        }
+    }
 }
 
 @ChildEntity()

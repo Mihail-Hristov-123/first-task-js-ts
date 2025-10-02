@@ -10,7 +10,7 @@ if (!DB_CONNECTION_STRING) {
     throw new Error('Env credentials missing')
 }
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
     type: 'postgres',
     url: DB_CONNECTION_STRING,
     ssl: true,
@@ -18,7 +18,11 @@ export const AppDataSource = new DataSource({
     entities: [Product, Customer, Order],
 })
 
-export const connectToDatabase = async () => {
+const customerRepo = AppDataSource.getRepository(Customer)
+const productRepo = AppDataSource.getRepository(Product)
+const orderRepo = AppDataSource.getRepository(Order)
+
+const connectToDatabase = async () => {
     try {
         await AppDataSource.initialize()
         console.log(`Successfully connected to DB`)
@@ -26,3 +30,5 @@ export const connectToDatabase = async () => {
         throw new Error(`Failed to connect to the database: ${error}`)
     }
 }
+
+export { customerRepo, productRepo, orderRepo, connectToDatabase }
