@@ -21,7 +21,7 @@ class OrderService {
 
         try {
             const newOrder = new Order(currentCustomer)
-            newOrder.products = ([...currentCustomer.cart])
+            newOrder.products = [...currentCustomer.cart]
             newOrder.total = calculateOrderTotal(newOrder)
             await orderRepo.save(newOrder)
             currentCustomer.cart.length = 0
@@ -32,13 +32,19 @@ class OrderService {
                 `Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`,
             )
         } catch (error) {
-            console.log(`Order placement failed: ${error}`)
+            console.error(`Order placement failed: ${error}`)
         }
     }
 
     async payAllOrders(customerInstance: Customer) {
         try {
-            const userUnpaidOrders = await orderRepo.find({ where: { owner: { id: customerInstance.id }, status: 'pending' }, relations: ['products'] })
+            const userUnpaidOrders = await orderRepo.find({
+                where: {
+                    owner: { id: customerInstance.id },
+                    status: 'pending',
+                },
+                relations: ['products'],
+            })
             if (userUnpaidOrders.length === 0) {
                 console.log(
                     `User with ID ${customerInstance.id} doesn't have any active orders - there's nothing to pay for`,
