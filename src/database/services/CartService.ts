@@ -7,6 +7,9 @@ class CartService {
     async addToCart(product: Product, currentCustomer: Customer) {
         try {
             limitProductAvailability(currentCustomer, product)
+            if (!currentCustomer.cart) {
+                currentCustomer.cart = []
+            }
             currentCustomer.cart.push(product)
             await customerRepo.save(currentCustomer)
             console.log(

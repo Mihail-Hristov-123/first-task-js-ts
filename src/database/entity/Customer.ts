@@ -2,7 +2,6 @@ import {
     ChildEntity,
     Column,
     Entity,
-    JoinColumn,
     JoinTable,
     ManyToMany,
     OneToMany,

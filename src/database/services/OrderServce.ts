@@ -25,6 +25,9 @@ class OrderService {
             newOrder.total = calculateOrderTotal(newOrder)
             await orderRepo.save(newOrder)
             currentCustomer.cart.length = 0
+            if (!currentCustomer.orders) {
+                currentCustomer.orders = []
+            }
             currentCustomer.orders.push(newOrder)
             await customerRepo.save(currentCustomer)
 

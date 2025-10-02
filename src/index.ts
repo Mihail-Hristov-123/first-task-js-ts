@@ -7,6 +7,7 @@ import {
     createUser,
     initializeStore,
 } from './database/services/StoreService.js'
+import { fetchInstance, type FetchableEntities } from './utils/fetchInstance.js'
 
 const customerRepo = AppDataSource.getRepository(Customer)
 const productRepo = AppDataSource.getRepository(Product)
@@ -35,7 +36,8 @@ class Store {
         balance: number,
         isPremiumMember: boolean,
     ) {
-        await createUser(name, email, balance, isPremiumMember)
+        const newUser = await createUser(name, email, balance, isPremiumMember)
+        return newUser
     }
 
     async addProductToCart(product: Product, customer: Customer) {
@@ -52,6 +54,11 @@ class Store {
 
     async payAllUserOrders(customer: Customer) {
         await customer.modifyOrder('payAllOrders')
+    }
+
+    // returns a single entity if it is found - not type safe yet
+    async find(query: FetchableEntities, id: number) {
+        return await fetchInstance(query, id)
     }
 }
 

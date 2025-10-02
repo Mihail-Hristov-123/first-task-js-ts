@@ -1,4 +1,4 @@
-import { customerRepo } from '../../index.js'
+import { customerRepo, orderRepo, productRepo } from '../../index.js'
 
 import { initializeProducts } from '../../utils/initializeProducts.js'
 import { connectToDatabase } from '../connection.js'
