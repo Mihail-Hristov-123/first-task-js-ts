@@ -1,7 +1,7 @@
 import type { Order } from "../database/entity/Order.js";
 import { productRepo } from "../index.js";
 
-
+// fix later - doesn't seem to work when the quantity of a product is reduced more than twice
 
 const findProduct = async (productId: number) => {
     const currentProduct = await productRepo.findOneBy({ id: productId })
