@@ -1,4 +1,13 @@
-import { ChildEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import {
+    ChildEntity,
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 import {
     handleCartOperation,
     type CartOperation,
@@ -8,6 +17,7 @@ import {
     type OrderOperation,
 } from '../services/OrderServce.js'
 import { Order } from './Order.js'
+import { Product } from './Product.js'
 
 @Entity()
 abstract class Customer {
@@ -29,10 +39,14 @@ abstract class Customer {
     @Column('real')
     balance: number
 
-    @Column('int', { array: true })
-    cart: number[]
+    @ManyToMany(() => Product, { cascade: true, eager: true })
+    @JoinTable()
+    cart: Product[]
 
-    @OneToMany(() => Order, (order) => order.owner, { cascade: true, eager: true })
+    @OneToMany(() => Order, (order) => order.owner, {
+        cascade: true,
+        eager: true,
+    })
     orders: Order[]
 
     public constructor(
@@ -50,12 +64,10 @@ abstract class Customer {
         this.hasDiscounts = hasDiscounts
         this.hasPriority = hasPriority
         this.balance = balance
-        this.cart = []
-
     }
 
-    async modifyCart(operation: CartOperation, productId: number) {
-        await handleCartOperation(operation, this, productId)
+    async modifyCart(operation: CartOperation, product: Product) {
+        await handleCartOperation(operation, this, product)
     }
 
     async modifyOrder(operation: OrderOperation) {

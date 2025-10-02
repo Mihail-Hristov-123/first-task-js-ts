@@ -11,17 +11,22 @@ class OrderService {
     async placeOrder(currentCustomer: Customer) {
         const cartItems = currentCustomer.cart
         if (cartItems.length === 0) {
-            console.log("Customer's cart is is empty, so an order could not be placed")
+            console.log(
+                "Customer's cart is is empty, so an order could not be placed",
+            )
             return
         }
-        const newOrder = new Order(currentCustomer.cart, currentCustomer)
+        const newOrder = new Order(currentCustomer)
+        newOrder.products = currentCustomer.cart
 
         try {
-            currentCustomer.cart = []
+            currentCustomer.cart.length = 0
             currentCustomer.orders.push(newOrder)
             await customerRepo.save(currentCustomer)
 
-            console.log(`Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`)
+            // console.log(
+            //     `Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`,
+            // )
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
         }
@@ -29,18 +34,30 @@ class OrderService {
 
     async payAllOrders(customerInstance: Customer) {
         try {
-            const userUnpaidOrders = await orderRepo.findBy({ owner: { id: customerInstance.id }, status: 'pending' })
+            const userUnpaidOrders = await orderRepo.find({ where: { owner: { id: customerInstance.id }, status: 'pending' }, relations: ['products'] })
             if (userUnpaidOrders.length === 0) {
-                console.log(`User with ID ${customerInstance.id} doesn't have any active orders - there's nothing to pay for`)
+                console.log(
+                    `User with ID ${customerInstance.id} doesn't have any active orders - there's nothing to pay for`,
+                )
                 return
             }
 
-            const discountedTotal = calculateTotal(userUnpaidOrders, customerInstance.hasDiscounts)
-            console.log(await simulatePayment(customerInstance.balance, discountedTotal))
+            const discountedTotal = calculateTotal(
+                userUnpaidOrders,
+                customerInstance.hasDiscounts,
+            )
+            console.log(
+                await simulatePayment(
+                    customerInstance.balance,
+                    discountedTotal,
+                ),
+            )
             await reduceBalance(customerInstance, discountedTotal)
             await completeOrders(userUnpaidOrders)
             await reduceQuantityFromOrder(userUnpaidOrders)
-            console.log(`User ${customerInstance.id} has successfully paid for all their orders`)
+            console.log(
+                `User ${customerInstance.id} has successfully paid for all their orders`,
+            )
         } catch (error) {
             console.error(`An error occurred during order payment: ${error}`)
         }

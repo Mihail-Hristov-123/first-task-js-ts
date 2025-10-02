@@ -1,30 +1,23 @@
-import type { Order } from "../database/entity/Order.js";
-import { productRepo } from "../index.js";
+import type { Order } from '../database/entity/Order.js'
+import type { Product } from '../database/entity/Product.js'
+import { productRepo } from '../index.js'
 
 // fix later - doesn't seem to work when the quantity of a product is reduced more than twice
 
-const findProduct = async (productId: number) => {
-    const currentProduct = await productRepo.findOneBy({ id: productId })
-    if (!currentProduct) {
-        throw new Error(`Product with ID ${productId} was not found`)
-    }
-    return currentProduct
+
+
+const reduceProductQuantity = async (product: Product) => {
+
+    await product.modifyProduct('decreaseQuantity')
+    console.log(
+        `The available quantity of product with ID ${product.id} was reduced`,
+    )
 }
-
-
-const reduceProductQuantity = async (productId: number) => {
-    const currentProduct = await findProduct(productId)
-    await currentProduct.modifyProduct('decreaseQuantity')
-    console.log(`The available quantity of product with ID ${productId} was reduced`)
-}
-
 
 export const reduceQuantityFromOrder = async (orders: Order[]) => {
     for (const order of orders) {
-        await Promise.all(order.cartItemIds.map(item => reduceProductQuantity(item)))
+        await Promise.all(
+            order.products.map((item) => reduceProductQuantity(item)),
+        )
     }
 }
-
-
-
-

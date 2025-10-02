@@ -10,9 +10,9 @@ class ProductService {
             return
         }
         productInstance.quantityInStock -= 1
+        console.log(productInstance.quantityInStock)
         await productRepo.save(productInstance)
     }
-
 }
 
 export type ProductOperation = keyof ProductService

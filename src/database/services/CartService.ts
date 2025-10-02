@@ -1,20 +1,17 @@
 import { customerRepo, productRepo } from '../../index.js'
 import { limitProductAvailability } from '../../utils/limitProductAvailability.js'
 import { Customer } from '../entity/Customer.js'
+import type { Product } from '../entity/Product.js'
 
 class CartService {
-    async addToCart(productId: number, currentCustomer: Customer) {
+    async addToCart(product: Product, currentCustomer: Customer) {
         try {
-            const product = await productRepo.findOneBy({ id: productId })
-            limitProductAvailability(
-                currentCustomer,
-                productId,
-                product || undefined,
-            )
-            currentCustomer.cart.push(productId)
+
+            limitProductAvailability(currentCustomer, product)
+            currentCustomer.cart.push(product)
             await customerRepo.save(currentCustomer)
             console.log(
-                `Product with ID ${productId} was added to ${currentCustomer.name}'s cart`,
+                `Product with ID ${product.id} was added to ${currentCustomer.name}'s cart`,
             )
         } catch (error) {
             console.error(
@@ -23,18 +20,18 @@ class CartService {
         }
     }
 
-    async removeFromCart(productId: number, currentCustomer: Customer) {
-        const productIndex = currentCustomer.cart.indexOf(productId)
+    async removeFromCart(product: Product, currentCustomer: Customer) {
+        const productIndex = currentCustomer.cart.indexOf(product)
         if (productIndex === -1) {
             console.log(
-                `Product with id ${productId} was not in ${currentCustomer.name}'s cart`,
+                `Product with id ${product.id} was not in ${currentCustomer.name}'s cart`,
             )
             return
         }
         currentCustomer.cart.splice(productIndex, 1)
         await customerRepo.save(currentCustomer)
         console.log(
-            `Product with id ${productId} was successfully removed from ${currentCustomer.name}'s cart`,
+            `Product with id ${product.id} was successfully removed from ${currentCustomer.name}'s cart`,
         )
     }
 }
@@ -44,15 +41,15 @@ export type CartOperation = keyof CartService
 export const handleCartOperation = async (
     operation: CartOperation,
     customerInstance: Customer,
-    productId: number,
+    product: Product,
 ) => {
     const cartService = new CartService()
     switch (operation) {
         case 'addToCart':
-            await cartService.addToCart(productId, customerInstance)
+            await cartService.addToCart(product, customerInstance)
             break
         case 'removeFromCart':
-            await cartService.removeFromCart(productId, customerInstance)
+            await cartService.removeFromCart(product, customerInstance)
             break
         default:
             break

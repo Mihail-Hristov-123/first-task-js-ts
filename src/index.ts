@@ -1,8 +1,11 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import { Customer, PremiumCustomer, RegularCustomer } from './database/entity/Customer.js'
+import {
+    Customer,
+    PremiumCustomer,
+    RegularCustomer,
+} from './database/entity/Customer.js'
 import { Order } from './database/entity/Order.js'
 import { Product } from './database/entity/Product.js'
-
 
 import { fetchProducts } from './database/population.js'
 import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
@@ -61,13 +64,21 @@ class Store {
 }
 
 await Store.establishConnection()
-const misho = await customerRepo.findOneBy({ id: 1 })
-await misho?.modifyCart('addToCart', 91)
-await misho?.modifyCart('addToCart', 90)
-await misho?.modifyCart('addToCart', 91)
-await misho?.modifyCart('addToCart', 90)
-await misho?.modifyCart('addToCart', 91)
-await misho?.modifyCart('addToCart', 90)
+
+const misho = await customerRepo.findOne({ where: { id: 1 }, relations: ['cart'] })
+const productOne = await productRepo.findOneBy({ id: 1 })
+const productTwo = await productRepo.findOneBy({ id: 2 })
+
+await misho?.modifyCart('addToCart', productOne!)
+await misho?.modifyCart('addToCart', productTwo!)
+await misho?.modifyCart('addToCart', productOne!)
+await misho?.modifyCart('addToCart', productTwo!)
+await misho?.modifyCart('addToCart', productOne!)
+await misho?.modifyCart('addToCart', productTwo!)
+// // await misho?.modifyCart('addToCart', 91)
+// // await misho?.modifyCart('addToCart', 90)
+// // await misho?.modifyCart('addToCart', 91)
+// // await misho?.modifyCart('addToCart', 90)
 await misho?.modifyOrder('placeOrder')
 await misho?.modifyOrder('payAllOrders')
 
