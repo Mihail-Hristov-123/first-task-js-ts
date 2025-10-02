@@ -1,8 +1,20 @@
-import { Product } from '../database/entity/Product.js'
-import { fetchProducts } from '../database/population.js'
+import { Product } from '../database/entity/product.entity.js'
+
 import { productRepo } from '../database/connection.js'
 
 import { generateRandomQuantity } from './generateRandomQuantity.js'
+
+const PRODUCT_API_URL = 'https://fakestoreapi.com/products'
+
+const fetchProducts = async () => {
+    try {
+        const response = await fetch(PRODUCT_API_URL)
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error(`Product fetch and DB population failed: ${error}`)
+    }
+}
 
 export const initializeProducts = async () => {
     try {

@@ -1,14 +1,13 @@
-import { orderRepo, productRepo } from './database/connection.js'
-import { Customer } from './database/entity/Customer.js'
-import { Product } from './database/entity/Product.js'
+import { Customer } from './database/entity/customer.entity.js'
+import { Product } from './database/entity/product.entity.js'
 
 import {
     createUser,
     initializeStore,
-} from './database/services/StoreService.js'
+} from './database/services/store.service.js'
 import { fetchInstance, type FetchableEntities } from './utils/fetchInstance.js'
 
-class Store {
+export class Store {
     static #instance: Store
 
     private constructor() {}
@@ -56,6 +55,3 @@ class Store {
         return await fetchInstance(query, id)
     }
 }
-
-const store = Store.instance
-await store.openStore()

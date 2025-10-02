@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import { DataSource } from 'typeorm'
-import { Order } from './entity/Order.js'
-import { Customer } from './entity/Customer.js'
-import { Product } from './entity/Product.js'
+import { Order } from './entity/order.entity.js'
+import { Customer } from './entity/customer.entity.js'
+import { Product } from './entity/product.entity.js'
 
 const DB_CONNECTION_STRING = process.env.DB_PASS
 

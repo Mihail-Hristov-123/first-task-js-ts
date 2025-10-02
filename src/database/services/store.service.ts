@@ -1,13 +1,18 @@
 import { initializeProducts } from '../../utils/initializeProducts.js'
-import { connectToDatabase, customerRepo } from '../connection.js'
-import { PremiumCustomer, RegularCustomer } from '../entity/Customer.js'
+import { connectToDatabase, customerRepo, productRepo } from '../connection.js'
+import { PremiumCustomer, RegularCustomer } from '../entity/customer.entity.js'
 
 class StoreService {
     async initializeStore() {
         try {
             await connectToDatabase()
-            await initializeProducts()
-            console.log(`The store is now open and ready for new orders!`)
+            const alreadyStocked = Boolean(await productRepo.count())
+            if (!alreadyStocked) {
+                await initializeProducts()
+            }
+            console.log(
+                `The store is now open ${alreadyStocked ? 'once again' : ', freshly stocked'} and ready for new orders!`,
+            )
         } catch (error) {
             console.error(error)
         }

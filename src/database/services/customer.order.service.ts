@@ -1,13 +1,13 @@
 import { calculateOrderTotal } from '../../utils/calculateOrderTotal.js'
-import { calculateTotal } from '../../utils/calculateTotal.js'
+import { calculateDiscountedTotal } from '../../utils/calculateDiscountedTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
 import { reduceBalance } from '../../utils/reduceBalance.js'
-import { reduceProductQuantity } from '../../utils/reduceProductQuantity.js'
+import { reduceAllOrdersProductQuantity } from '../../utils/reduceAllOrdersProductQuantity.js'
 
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import { customerRepo, orderRepo } from '../connection.js'
-import type { Customer } from '../entity/Customer.js'
-import { Order } from '../entity/Order.js'
+import type { Customer } from '../entity/customer.entity.js'
+import { Order } from '../entity/order.entity.js'
 
 class OrderService {
     async placeOrder(currentCustomer: Customer) {
@@ -55,25 +55,32 @@ class OrderService {
                 return
             }
 
-            const discountedTotal = calculateTotal(
+            const discountedTotal = calculateDiscountedTotal(
                 userUnpaidOrders,
                 customerInstance.hasDiscounts,
             )
-            console.log(
-                await simulatePayment(
-                    customerInstance.balance,
-                    discountedTotal,
-                ),
+            await this.handlePayment(
+                customerInstance,
+                discountedTotal,
+                userUnpaidOrders,
             )
-            await reduceBalance(customerInstance, discountedTotal)
-            await completeOrders(userUnpaidOrders)
-            await reduceProductQuantity(userUnpaidOrders)
             console.log(
                 `User ${customerInstance.id} has successfully paid for all their orders`,
             )
         } catch (error) {
             console.error(`An error occurred during order payment: ${error}`)
         }
+    }
+
+    async handlePayment(
+        customer: Customer,
+        discountedTotal: number,
+        ordersToPay: Order[],
+    ) {
+        console.log(await simulatePayment(customer.balance, discountedTotal))
+        await reduceBalance(customer, discountedTotal)
+        await completeOrders(ordersToPay)
+        await reduceAllOrdersProductQuantity(ordersToPay)
     }
 }
 
