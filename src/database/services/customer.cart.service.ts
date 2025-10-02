@@ -1,21 +1,22 @@
-import { customerRepo, productRepo } from '../../index.js'
 import { limitProductAvailability } from '../../utils/limitProductAvailability.js'
-import { Customer } from '../entity/Customer.js'
-import type { Product } from '../entity/Product.js'
+import { customerRepo } from '../connection.js'
+import { Customer, type Product } from '../../types/entity.types.js'
 
 class CartService {
     async addToCart(product: Product, currentCustomer: Customer) {
         try {
-
             limitProductAvailability(currentCustomer, product)
+            if (!currentCustomer.cart) {
+                currentCustomer.cart = []
+            }
             currentCustomer.cart.push(product)
             await customerRepo.save(currentCustomer)
             console.log(
-                `Product with ID ${product.id} was added to ${currentCustomer.name}'s cart`,
+                `Product #${product.id} was added to customer #${currentCustomer.id}'s cart`,
             )
         } catch (error) {
             console.error(
-                `Error occurred while adding product to cart: ${error}`,
+                `Error occurred while adding product to customer #${currentCustomer.id}'s cart: ${error}`,
             )
         }
     }
@@ -24,15 +25,21 @@ class CartService {
         const productIndex = currentCustomer.cart.indexOf(product)
         if (productIndex === -1) {
             console.log(
-                `Product with id ${product.id} was not in ${currentCustomer.name}'s cart`,
+                `Product #${product.id} was not in customer #${currentCustomer.name}'s cart`,
             )
             return
         }
         currentCustomer.cart.splice(productIndex, 1)
-        await customerRepo.save(currentCustomer)
-        console.log(
-            `Product with id ${product.id} was successfully removed from ${currentCustomer.name}'s cart`,
-        )
+        try {
+            await customerRepo.save(currentCustomer)
+            console.log(
+                `Product #${product.id} was successfully removed from customer #${currentCustomer.name}'s cart`,
+            )
+        } catch (error) {
+            console.error(
+                `Error occurred while removing product #${product.id} from customer #${currentCustomer.id}'s cart: ${error}`,
+            )
+        }
     }
 }
 
@@ -52,6 +59,7 @@ export const handleCartOperation = async (
             await cartService.removeFromCart(product, customerInstance)
             break
         default:
+            console.warn(`Unhandled operation type: ${operation}`)
             break
     }
 }

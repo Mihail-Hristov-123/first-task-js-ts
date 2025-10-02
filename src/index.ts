@@ -1,23 +1,20 @@
-import { AppDataSource, connectToDatabase } from './database/connection.js'
+import { orderRepo, productRepo } from './database/connection.js'
+import { Customer } from './database/entity/customer.entity.js'
+import type { Order } from './database/entity/order.entity.js'
+import { Product } from './database/entity/product.entity.js'
+import { getSummary } from './database/services/customer.order.service.js'
+
 import {
-    Customer,
-    PremiumCustomer,
-    RegularCustomer,
-} from './database/entity/Customer.js'
-import { Order } from './database/entity/Order.js'
-import { Product } from './database/entity/Product.js'
+    createUser,
+    initializeStore,
+} from './database/services/store.service.js'
 
-import { fetchProducts } from './database/population.js'
-import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
+import { fetchInstance, type FetchableEntities } from './utils/fetchInstance.js'
 
-const customerRepo = AppDataSource.getRepository(Customer)
-const productRepo = AppDataSource.getRepository(Product)
-const orderRepo = AppDataSource.getRepository(Order)
-
-class Store {
+export class Store {
     static #instance: Store
 
-    private constructor() { }
+    private constructor() {}
 
     static get instance() {
         if (!Store.#instance) {
@@ -26,43 +23,71 @@ class Store {
         return Store.#instance
     }
 
-    static async establishConnection() {
-        await connectToDatabase()
+    // Connects to DB, fetches and inserts products from provided API
+    async openStore() {
+        await initializeStore()
     }
 
-    static async initializeProducts() {
-        try {
-            const newProducts = await fetchProducts()
-            const productsToInitialize: Product[] = []
-            for (const article of newProducts) {
-                const { description, title: name, price } = article
-                const newArticle = new Product(
-                    name,
-                    description,
-                    price,
-                    generateRandomQuantity(),
-                )
-                productsToInitialize.push(newArticle)
-            }
-            await productRepo.insert(productsToInitialize)
-            console.log(
-                `${productsToInitialize.length} products have been added to the store`,
+    async addNewCustomer(
+        name: string,
+        email: string,
+        balance: number,
+        isPremiumMember: boolean,
+    ) {
+        const newUser = await createUser(name, email, balance, isPremiumMember)
+        return newUser
+    }
+
+    async addProductToCart(product: Product, customer: Customer) {
+        await customer.modifyCart('addToCart', product)
+    }
+
+    async removeProductFromCart(product: Product, customer: Customer) {
+        await customer.modifyCart('removeFromCart', product)
+    }
+
+    async placeOrder(customer: Customer) {
+        await customer.modifyOrder('placeOrder')
+    }
+
+    async payAllUserOrders(customer: Customer) {
+        await customer.modifyOrder('payAllOrders')
+    }
+
+    // returns a single entity if it is found - not type safe yet
+    async find(query: FetchableEntities, id: number) {
+        return await fetchInstance(query, id)
+    }
+    getOrderSummary(order: Order) {
+        if (!order.owner) {
+            console.warn(
+                'Please include the necessary owner relation before getting a order summary',
             )
-        } catch (error) {
-            console.error(`Products initialization error: ${error}`)
+            return
         }
-    }
-
-    static async removeAllProducts() {
-        try {
-            await productRepo.clear()
-            console.log('All products have been removed - the store is empty')
-        } catch (error) {
-            console.error(`Error occurred during product removal: ${error}`)
-        }
+        console.log(getSummary(order))
     }
 }
 
+const store = Store.instance
 
+await store.openStore()
 
-export { orderRepo, customerRepo, productRepo }
+const testUser = await store.addNewCustomer(
+    'Michael',
+    'misho@gsmsasisl.cosm',
+    2000,
+    false,
+)
+const prodOne = await productRepo.findOneBy({ id: 1 })
+const prodTwo = await productRepo.findOneBy({ id: 2 })
+await store.addProductToCart(prodOne!, testUser!)
+await store.addProductToCart(prodTwo!, testUser!)
+
+await store.placeOrder(testUser!)
+const order = await orderRepo.findOne({
+    where: { id: 1 },
+    relations: ['owner', 'products'],
+})
+console.log(getSummary(order!))
+await store.payAllUserOrders(testUser!)

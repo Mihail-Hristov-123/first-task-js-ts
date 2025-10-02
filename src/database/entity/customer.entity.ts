@@ -2,7 +2,6 @@ import {
     ChildEntity,
     Column,
     Entity,
-    JoinColumn,
     JoinTable,
     ManyToMany,
     OneToMany,
@@ -11,13 +10,10 @@ import {
 import {
     handleCartOperation,
     type CartOperation,
-} from '../services/CartService.js'
-import {
-    handleOrderOperation,
-    type OrderOperation,
-} from '../services/OrderServce.js'
-import { Order } from './Order.js'
-import { Product } from './Product.js'
+} from '../services/customer.cart.service.js'
+import { handleOrderOperation } from '../services/customer.order.service.js'
+import { Order, Product } from '../../types/entity.types.js'
+import type { OrderOperation } from '../../types/service.types.js'
 
 @Entity()
 abstract class Customer {
@@ -71,6 +67,12 @@ abstract class Customer {
 
     async modifyOrder(operation: OrderOperation) {
         await handleOrderOperation(operation, this)
+    }
+
+    *[Symbol.iterator]() {
+        for (const item of this.cart) {
+            yield item
+        }
     }
 }
 

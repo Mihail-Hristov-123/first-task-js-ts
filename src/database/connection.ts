@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import { DataSource } from 'typeorm'
-import { Order } from './entity/Order.js'
-import { Customer } from './entity/Customer.js'
-import { Product } from './entity/Product.js'
+import { Order } from './entity/order.entity.js'
+import { Customer } from './entity/customer.entity.js'
+import { Product } from './entity/product.entity.js'
 
 const DB_CONNECTION_STRING = process.env.DB_PASS
 
@@ -10,7 +10,7 @@ if (!DB_CONNECTION_STRING) {
     throw new Error('Env credentials missing')
 }
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
     type: 'postgres',
     url: DB_CONNECTION_STRING,
     ssl: true,
@@ -18,11 +18,17 @@ export const AppDataSource = new DataSource({
     entities: [Product, Customer, Order],
 })
 
-export const connectToDatabase = async () => {
+const customerRepo = AppDataSource.getRepository(Customer)
+const productRepo = AppDataSource.getRepository(Product)
+const orderRepo = AppDataSource.getRepository(Order)
+
+const connectToDatabase = async () => {
     try {
         await AppDataSource.initialize()
         console.log(`Successfully connected to DB`)
     } catch (error) {
-        console.error(`Failed to connect to the database: ${error}`)
+        throw new Error(`Failed to connect to the database: ${error}`)
     }
 }
+
+export { customerRepo, productRepo, orderRepo, connectToDatabase }

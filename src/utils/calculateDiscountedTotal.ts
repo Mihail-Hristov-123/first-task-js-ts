@@ -1,8 +1,8 @@
-import type { Order } from '../database/entity/Order.js'
+import type { Order } from '../database/entity/order.entity.js'
 
 const DISCOUNT_COEFFICIENT = 0.1
 
-export const calculateTotal = (
+export const calculateDiscountedTotal = (
     orders: Order[],
     shouldReceiveDiscount: boolean,
 ) => {
