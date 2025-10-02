@@ -8,11 +8,18 @@ import { Order } from '../entity/Order.js'
 
 class OrderService {
     async placeOrder(currentCustomer: Customer) {
+        const cartItems = currentCustomer.cart
+        if (cartItems.length === 0) {
+            console.log("Customer's cart is is empty, so an order could not be placed")
+            return
+        }
         const newOrder = new Order(currentCustomer.cart, currentCustomer)
+
         try {
-            await orderRepo.save(newOrder)
             currentCustomer.cart = []
-            customerRepo.save(currentCustomer)
+            currentCustomer.orders.push(newOrder)
+            await customerRepo.save(currentCustomer)
+
             console.log('Order placed')
         } catch (error) {
             console.log(`Order placement failed: ${error}`)

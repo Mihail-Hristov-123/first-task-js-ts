@@ -51,6 +51,7 @@ abstract class Customer {
         this.hasPriority = hasPriority
         this.balance = balance
         this.cart = []
+
     }
 
     async modifyCart(operation: CartOperation, productId: number) {
