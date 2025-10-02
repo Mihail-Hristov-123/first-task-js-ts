@@ -1,7 +1,6 @@
 import { customerRepo, orderRepo, productRepo } from '../database/connection.js'
 
 export type FetchableEntities = 'customer' | 'product' | 'order'
-
 const getAppropriateRepo = (query: FetchableEntities) => {
     switch (query) {
         case 'customer':

@@ -11,12 +11,9 @@ import {
     handleCartOperation,
     type CartOperation,
 } from '../services/customer.cart.service.js'
-import {
-    handleOrderOperation,
-    type OrderOperation,
-} from '../services/customer.order.service.js'
-import { Order } from './order.entity.js'
-import { Product } from './product.entity.js'
+import { handleOrderOperation } from '../services/customer.order.service.js'
+import { Order, Product } from '../../types/entity.types.js'
+import type { OrderOperation } from '../../types/service.types.js'
 
 @Entity()
 abstract class Customer {

@@ -3,13 +3,12 @@ import { calculateDiscountedTotal } from '../../utils/calculateDiscountedTotal.j
 import { completeOrders } from '../../utils/completeOrders.js'
 import { reduceBalance } from '../../utils/reduceBalance.js'
 import { reduceAllOrdersProductQuantity } from '../../utils/reduceAllOrdersProductQuantity.js'
-
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import { customerRepo, orderRepo } from '../connection.js'
-import type { Customer } from '../entity/customer.entity.js'
-import { Order } from '../entity/order.entity.js'
+import { Order, type Customer } from '../../types/entity.types.js'
+import type { OrderOperation, OrderSummary } from '../../types/service.types.js'
 
-class OrderService {
+export class OrderService {
     async placeOrder(currentCustomer: Customer) {
         const cartItems = currentCustomer.cart
         if (cartItems.length === 0) {
@@ -71,7 +70,26 @@ class OrderService {
             console.error(`An error occurred during order payment: ${error}`)
         }
     }
-
+    getSummary(order: Order): OrderSummary {
+        return {
+            id: order.id,
+            status: order.status,
+            total: order.total,
+            owner: {
+                id: order.owner.id,
+                name: order.owner.name,
+            },
+            products: order.products.map(
+                ({ id, name, price, quantityInStock, isAvailable }) => ({
+                    id,
+                    name,
+                    price,
+                    quantityInStock,
+                    isAvailable,
+                }),
+            ),
+        }
+    }
     async handlePayment(
         customer: Customer,
         discountedTotal: number,
@@ -84,13 +102,12 @@ class OrderService {
     }
 }
 
-export type OrderOperation = keyof OrderService
+const orderService = new OrderService()
 
-export const handleOrderOperation = async (
+const handleOrderOperation = async (
     operation: OrderOperation,
     customerInstance: Customer,
 ) => {
-    const orderService = new OrderService()
     switch (operation) {
         case 'placeOrder':
             await orderService.placeOrder(customerInstance)
@@ -98,9 +115,12 @@ export const handleOrderOperation = async (
         case 'payAllOrders':
             await orderService.payAllOrders(customerInstance)
             break
-
         default:
             console.warn(`Unhandled operation type: ${operation}`)
             break
     }
 }
+
+const getSummary = orderService.getSummary
+
+export { getSummary, handleOrderOperation }

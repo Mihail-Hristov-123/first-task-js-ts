@@ -1,7 +1,6 @@
 import { limitProductAvailability } from '../../utils/limitProductAvailability.js'
 import { customerRepo } from '../connection.js'
-import { Customer } from '../entity/customer.entity.js'
-import type { Product } from '../entity/product.entity.js'
+import { Customer, type Product } from '../../types/entity.types.js'
 
 class CartService {
     async addToCart(product: Product, currentCustomer: Customer) {

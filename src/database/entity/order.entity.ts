@@ -7,19 +7,10 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm'
 
-import { Customer } from './customer.entity.js'
-import { Product } from './product.entity.js'
+import { Customer, Product } from '../../types/entity.types.js'
 
-type Status = 'pending' | 'complete'
+import type { Status } from '../../types/entity.types.js'
 
-type ProductSummary = Pick<Product, 'id' | 'name'>
-
-type CustomerSummary = Pick<Customer, 'id' | 'name'>
-
-type OrderSummary = Pick<Order, 'id' | 'status' | 'total'> & {
-    products: ProductSummary[]
-    owner: CustomerSummary
-}
 @Entity()
 export class Order {
     @PrimaryGeneratedColumn()
@@ -37,22 +28,6 @@ export class Order {
 
     @ManyToOne(() => Customer, (customer) => customer.orders)
     owner: Customer
-
-    getSummary(order: Order): OrderSummary {
-        return {
-            id: order.id,
-            status: order.status,
-            total: order.total,
-            products: order.products.map((p) => ({
-                id: p.id,
-                name: p.name,
-            })),
-            owner: {
-                id: order.owner.id,
-                name: order.owner.name,
-            },
-        }
-    }
 
     constructor(owner: Customer) {
         this.owner = owner
