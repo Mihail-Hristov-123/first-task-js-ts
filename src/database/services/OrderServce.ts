@@ -3,7 +3,8 @@ import { calculateOrderTotal } from '../../utils/calculateOrderTotal.js'
 import { calculateTotal } from '../../utils/calculateTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
 import { reduceBalance } from '../../utils/reduceBalance.js'
-import { reduceQuantityFromOrder } from '../../utils/reduceQuantity.js'
+import { reduceProductQuantity } from '../../utils/reduceProductQuantity.js'
+
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import type { Customer } from '../entity/Customer.js'
 import { Order } from '../entity/Order.js'
@@ -17,12 +18,12 @@ class OrderService {
             )
             return
         }
-        const newOrder = new Order(currentCustomer)
-
-        newOrder.products = currentCustomer.cart
-        // newOrder.total = calculateOrderTotal(newOrder)
 
         try {
+            const newOrder = new Order(currentCustomer)
+            newOrder.products = ([...currentCustomer.cart])
+            newOrder.total = calculateOrderTotal(newOrder)
+            await orderRepo.save(newOrder)
             currentCustomer.cart.length = 0
             currentCustomer.orders.push(newOrder)
             await customerRepo.save(currentCustomer)
@@ -57,7 +58,7 @@ class OrderService {
             )
             await reduceBalance(customerInstance, discountedTotal)
             await completeOrders(userUnpaidOrders)
-            await reduceQuantityFromOrder(userUnpaidOrders)
+            await reduceProductQuantity(userUnpaidOrders)
             console.log(
                 `User ${customerInstance.id} has successfully paid for all their orders`,
             )

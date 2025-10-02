@@ -39,12 +39,11 @@ abstract class Customer {
     @Column('real')
     balance: number
 
-    @ManyToMany(() => Product, { cascade: true, eager: true })
+    @ManyToMany(() => Product, { eager: true })
     @JoinTable()
     cart: Product[]
 
     @OneToMany(() => Order, (order) => order.owner, {
-        cascade: true,
         eager: true,
     })
     orders: Order[]

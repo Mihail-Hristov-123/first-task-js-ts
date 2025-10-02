@@ -22,6 +22,7 @@ export const handleProductOperation = async (
     productInstance: Product,
 ) => {
     const productService = new ProductService()
+    console.log(productInstance.quantityInStock)
     switch (operation) {
         case 'decreaseQuantity':
             await productService.decreaseQuantity(productInstance)
@@ -30,4 +31,5 @@ export const handleProductOperation = async (
         default:
             break
     }
+    console.log(productInstance.quantityInStock)
 }

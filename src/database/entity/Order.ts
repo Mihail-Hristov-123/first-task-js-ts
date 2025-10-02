@@ -19,7 +19,7 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number
 
-    @ManyToMany(() => Product, { cascade: true })
+    @ManyToMany(() => Product)
     @JoinTable()
     products: Product[]
 
@@ -57,5 +57,6 @@ export class Order {
 
     constructor(owner: Customer) {
         this.owner = owner
+
     }
 }
