@@ -10,6 +10,7 @@ import {
 import { productRepo } from '../../index.js'
 import { Customer } from './Customer.js'
 import { Product } from './Product.js'
+import { calculateOrderTotal } from '../../utils/calculateOrderTotal.js'
 
 type Status = 'pending' | 'complete'
 
@@ -46,15 +47,14 @@ export class Order {
     //     this.total = total
     // }
 
-    // constructor(cartItemIds: number[], owner: Customer) {
-    //     this.cartItemIds = cartItemIds
-    //     this.owner = owner
-    // }
-    // *[Symbol.iterator]() {
-    //     for (const item of this.products) {
-    //         yield item
-    //     }
-    // }
+
+    *[Symbol.iterator]() {
+        for (const item of this.products) {
+            yield item
+        }
+    }
+
+
     constructor(owner: Customer) {
         this.owner = owner
     }

@@ -1,4 +1,5 @@
 import { customerRepo, orderRepo } from '../../index.js'
+import { calculateOrderTotal } from '../../utils/calculateOrderTotal.js'
 import { calculateTotal } from '../../utils/calculateTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
 import { reduceBalance } from '../../utils/reduceBalance.js'
@@ -17,16 +18,18 @@ class OrderService {
             return
         }
         const newOrder = new Order(currentCustomer)
+
         newOrder.products = currentCustomer.cart
+        // newOrder.total = calculateOrderTotal(newOrder)
 
         try {
             currentCustomer.cart.length = 0
             currentCustomer.orders.push(newOrder)
             await customerRepo.save(currentCustomer)
 
-            // console.log(
-            //     `Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`,
-            // )
+            console.log(
+                `Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`,
+            )
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
         }
