@@ -1,14 +1,12 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import {
-    Customer,
-    PremiumCustomer,
-    RegularCustomer,
-} from './database/entity/Customer.js'
+import { Customer } from './database/entity/Customer.js'
 import { Order } from './database/entity/Order.js'
 import { Product } from './database/entity/Product.js'
 
-import { fetchProducts } from './database/population.js'
-import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
+import {
+    createUser,
+    initializeStore,
+} from './database/services/StoreService.js'
 
 const customerRepo = AppDataSource.getRepository(Customer)
 const productRepo = AppDataSource.getRepository(Product)
@@ -17,7 +15,7 @@ const orderRepo = AppDataSource.getRepository(Order)
 class Store {
     static #instance: Store
 
-    private constructor() { }
+    private constructor() {}
 
     static get instance() {
         if (!Store.#instance) {
@@ -26,43 +24,38 @@ class Store {
         return Store.#instance
     }
 
-    static async establishConnection() {
-        await connectToDatabase()
+    // Connects to DB, fetches and inserts products from provided API
+    async openStore() {
+        await initializeStore()
     }
 
-    static async initializeProducts() {
-        try {
-            const newProducts = await fetchProducts()
-            const productsToInitialize: Product[] = []
-            for (const article of newProducts) {
-                const { description, title: name, price } = article
-                const newArticle = new Product(
-                    name,
-                    description,
-                    price,
-                    generateRandomQuantity(),
-                )
-                productsToInitialize.push(newArticle)
-            }
-            await productRepo.insert(productsToInitialize)
-            console.log(
-                `${productsToInitialize.length} products have been added to the store`,
-            )
-        } catch (error) {
-            console.error(`Products initialization error: ${error}`)
-        }
+    async addNewCustomer(
+        name: string,
+        email: string,
+        balance: number,
+        isPremiumMember: boolean,
+    ) {
+        await createUser(name, email, balance, isPremiumMember)
     }
 
-    static async removeAllProducts() {
-        try {
-            await productRepo.clear()
-            console.log('All products have been removed - the store is empty')
-        } catch (error) {
-            console.error(`Error occurred during product removal: ${error}`)
-        }
+    async addProductToCart(product: Product, customer: Customer) {
+        await customer.modifyCart('addToCart', product)
+    }
+
+    async removeProductFromCart(product: Product, customer: Customer) {
+        await customer.modifyCart('removeFromCart', product)
+    }
+
+    async placeOrder(customer: Customer) {
+        await customer.modifyOrder('placeOrder')
+    }
+
+    async payAllUserOrders(customer: Customer) {
+        await customer.modifyOrder('payAllOrders')
     }
 }
 
+const store = Store.instance
+await store.openStore()
 
-
-export { orderRepo, customerRepo, productRepo }
+export { customerRepo, productRepo, orderRepo }

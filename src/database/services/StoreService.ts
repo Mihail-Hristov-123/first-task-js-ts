@@ -2,12 +2,7 @@ import { customerRepo } from '../../index.js'
 
 import { initializeProducts } from '../../utils/initializeProducts.js'
 import { connectToDatabase } from '../connection.js'
-import {
-    Customer,
-    PremiumCustomer,
-    RegularCustomer,
-} from '../entity/Customer.js'
-import { Product } from '../entity/Product.js'
+import { PremiumCustomer, RegularCustomer } from '../entity/Customer.js'
 
 class StoreService {
     async establishConnection() {
@@ -38,20 +33,20 @@ class StoreService {
             )
         }
     }
+}
 
-    async addProductToCart(product: Product, customer: Customer) {
-        await customer.modifyCart('addToCart', product)
-    }
+const storeService = new StoreService()
 
-    async removeProductFromCart(product: Product, customer: Customer) {
-        await customer.modifyCart('removeFromCart', product)
-    }
-
-    async placeOrder(customer: Customer) {
-        await customer.modifyOrder('placeOrder')
-    }
-
-    async payAllUserOrders(customer: Customer) {
-        await customer.modifyOrder('payAllOrders')
+const initializeStore = async () => {
+    try {
+        await storeService.establishConnection()
+        await storeService.fetchProducts()
+        console.log(`The store is now open and ready for new orders!`)
+    } catch (error) {
+        console.error(error)
     }
 }
+
+const createUser = storeService.createUser
+
+export { createUser, initializeStore }
