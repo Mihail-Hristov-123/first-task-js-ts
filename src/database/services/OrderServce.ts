@@ -1,6 +1,7 @@
 import { customerRepo, orderRepo } from '../../index.js'
 import { calculateTotal } from '../../utils/calculateTotal.js'
 import { completeOrders } from '../../utils/completeOrders.js'
+import { reduceBalance } from '../../utils/reduceBalance.js'
 import { reduceQuantityFromOrder } from '../../utils/reduceQuantity.js'
 import { simulatePayment } from '../../utils/simulatePayment.js'
 import type { Customer } from '../entity/Customer.js'
@@ -20,40 +21,28 @@ class OrderService {
             currentCustomer.orders.push(newOrder)
             await customerRepo.save(currentCustomer)
 
-            console.log('Order placed')
+            console.log(`Order with a total price of ${newOrder.total.toFixed(2)} has been placed!`)
         } catch (error) {
             console.log(`Order placement failed: ${error}`)
         }
     }
 
-    async payAllOrders(currentCustomer: Customer) {
-        const { id: customerId } = currentCustomer
-
+    async payAllOrders(customerInstance: Customer) {
         try {
-            const allUserOrders = await orderRepo.findBy({ owner: { id: currentCustomer.id } })
-            if (allUserOrders.length === 0) {
-                console.log(
-                    `User with ID ${customerId} has no active orders at this moment`,
-                )
+            const userUnpaidOrders = await orderRepo.findBy({ owner: { id: customerInstance.id }, status: 'pending' })
+            if (userUnpaidOrders.length === 0) {
+                console.log(`User with ID ${customerInstance.id} doesn't have any active orders - there's nothing to pay for`)
                 return
             }
 
-            const totalPrice = calculateTotal(
-                allUserOrders,
-                currentCustomer.hasDiscounts,
-            )
-            console.log(allUserOrders, totalPrice)
-
-            console.log(
-                await simulatePayment(currentCustomer.balance, totalPrice),
-            )
-            currentCustomer.balance -= totalPrice
-            await completeOrders(allUserOrders)
-            await reduceQuantityFromOrder(allUserOrders)
-            await customerRepo.save(currentCustomer)
-            console.log(`User with ID ${customerId} has paid for all their orders`)
+            const discountedTotal = calculateTotal(userUnpaidOrders, customerInstance.hasDiscounts)
+            console.log(await simulatePayment(customerInstance.balance, discountedTotal))
+            await reduceBalance(customerInstance, discountedTotal)
+            await completeOrders(userUnpaidOrders)
+            await reduceQuantityFromOrder(userUnpaidOrders)
+            console.log(`User ${customerInstance.id} has successfully paid for all their orders`)
         } catch (error) {
-            console.error(`Error occurred during payment: ${error}`)
+            console.error(`An error occurred during order payment: ${error}`)
         }
     }
 }

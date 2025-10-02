@@ -12,8 +12,8 @@ export class Order {
     @Column('int', { array: true })
     cartItemIds: number[]
 
-    @Column()
-    private _status: Status
+    @Column({ type: 'enum', enum: ['pending', 'complete'], default: 'pending' })
+    status: Status
 
     @Column('real', { nullable: true })
     total: number
@@ -21,13 +21,7 @@ export class Order {
     @ManyToOne(() => Customer, (customer) => customer.orders)
     owner: Customer
 
-    get status() {
-        return this._status
-    }
 
-    set status(newStatus: Status) {
-        this._status = newStatus
-    }
 
     @BeforeInsert()
     async setTotal() {
@@ -47,7 +41,6 @@ export class Order {
     constructor(cartItemIds: number[], owner: Customer) {
         this.cartItemIds = cartItemIds
         this.owner = owner
-        this._status = 'pending'
     }
     *[Symbol.iterator]() {
         for (const item of this.cartItemIds) {

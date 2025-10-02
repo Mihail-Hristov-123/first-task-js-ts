@@ -15,15 +15,13 @@ const findProduct = async (productId: number) => {
 const reduceProductQuantity = async (productId: number) => {
     const currentProduct = await findProduct(productId)
     await currentProduct.modifyProduct('decreaseQuantity')
-    await productRepo.save(currentProduct)
     console.log(`The available quantity of product with ID ${productId} was reduced`)
 }
 
 
 export const reduceQuantityFromOrder = async (orders: Order[]) => {
-
     for (const order of orders) {
-        order.cartItemIds.forEach(async (item) => { await reduceProductQuantity(item) })
+        await Promise.all(order.cartItemIds.map(item => reduceProductQuantity(item)))
     }
 }
 
