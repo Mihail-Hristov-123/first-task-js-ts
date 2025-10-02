@@ -1,4 +1,4 @@
-import { productRepo } from '../../index.js'
+import { customerRepo, productRepo } from '../../index.js'
 import { limitProductAvailability } from '../../utils/limitProductAvailability.js'
 import { Customer } from '../entity/Customer.js'
 
@@ -12,6 +12,7 @@ class CartService {
                 product || undefined,
             )
             currentCustomer.cart.push(productId)
+            await customerRepo.save(currentCustomer)
             console.log(
                 `Product with ID ${productId} was added to ${currentCustomer.name}'s cart`,
             )
@@ -22,7 +23,7 @@ class CartService {
         }
     }
 
-    removeFromCart(productId: number, currentCustomer: Customer) {
+    async removeFromCart(productId: number, currentCustomer: Customer) {
         const productIndex = currentCustomer.cart.indexOf(productId)
         if (productIndex === -1) {
             console.log(
@@ -31,6 +32,7 @@ class CartService {
             return
         }
         currentCustomer.cart.splice(productIndex, 1)
+        await customerRepo.save(currentCustomer)
         console.log(
             `Product with id ${productId} was successfully removed from ${currentCustomer.name}'s cart`,
         )
@@ -50,7 +52,7 @@ export const handleCartOperation = async (
             await cartService.addToCart(productId, customerInstance)
             break
         case 'removeFromCart':
-            cartService.removeFromCart(productId, customerInstance)
+            await cartService.removeFromCart(productId, customerInstance)
             break
         default:
             break

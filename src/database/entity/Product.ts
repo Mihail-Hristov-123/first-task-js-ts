@@ -41,7 +41,7 @@ export class Product {
         return this.quantityInStock > 0
     }
 
-    modifyProduct(operation: ProductOperation) {
-        handleProductOperation(operation, this)
+    async modifyProduct(operation: ProductOperation) {
+        await handleProductOperation(operation, this)
     }
 }

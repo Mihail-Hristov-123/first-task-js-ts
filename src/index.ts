@@ -1,7 +1,9 @@
 import { AppDataSource, connectToDatabase } from './database/connection.js'
-import { PremiumCustomer, RegularCustomer } from './database/entity/Customer.js'
+import { Customer, PremiumCustomer, RegularCustomer } from './database/entity/Customer.js'
+import { Order } from './database/entity/Order.js'
+import { Product } from './database/entity/Product.js'
 
-import { Customer, Order, Product } from './database/entity/index.js'
+
 import { fetchProducts } from './database/population.js'
 import { generateRandomQuantity } from './utils/generateRandomQuantity.js'
 
@@ -59,10 +61,14 @@ class Store {
 }
 
 await Store.establishConnection()
-const joe = new PremiumCustomer('John', 'joe@gmail.com', 1000)
-joe.modifyCart('addToCart', 84)
-joe.modifyCart('addToCart', 85)
-await customerRepo.save(joe)
-await joe.modifyOrder('placeOrder')
-await joe.modifyOrder('payAllOrders')
+const misho = await customerRepo.findOneBy({ id: 1 })
+await misho?.modifyCart('addToCart', 91)
+await misho?.modifyCart('addToCart', 90)
+await misho?.modifyCart('addToCart', 91)
+await misho?.modifyCart('addToCart', 90)
+await misho?.modifyCart('addToCart', 91)
+await misho?.modifyCart('addToCart', 90)
+await misho?.modifyOrder('placeOrder')
+await misho?.modifyOrder('payAllOrders')
+
 export { orderRepo, customerRepo, productRepo }

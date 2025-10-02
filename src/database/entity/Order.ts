@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { productRepo } from '../../index.js'
+import { Customer } from './Customer.js'
 
 type Status = 'pending' | 'complete'
 
@@ -11,22 +12,16 @@ export class Order {
     @Column('int', { array: true })
     cartItemIds: number[]
 
-    @Column()
-    private _status: Status
+    @Column({ type: 'enum', enum: ['pending', 'complete'], default: 'pending' })
+    status: Status
 
     @Column('real', { nullable: true })
     total: number
 
-    @Column()
-    ownerId: number
+    @ManyToOne(() => Customer, (customer) => customer.orders)
+    owner: Customer
 
-    get status() {
-        return this._status
-    }
 
-    set status(newStatus: Status) {
-        this._status = newStatus
-    }
 
     @BeforeInsert()
     async setTotal() {
@@ -43,10 +38,9 @@ export class Order {
         this.total = total
     }
 
-    constructor(cartItemIds: number[], ownerId: number) {
+    constructor(cartItemIds: number[], owner: Customer) {
         this.cartItemIds = cartItemIds
-        this.ownerId = ownerId
-        this._status = 'pending'
+        this.owner = owner
     }
     *[Symbol.iterator]() {
         for (const item of this.cartItemIds) {
