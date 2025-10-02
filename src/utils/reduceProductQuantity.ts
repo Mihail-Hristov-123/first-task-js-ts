@@ -1,14 +1,14 @@
-import type { Customer } from "../database/entity/Customer.js";
+
 import type { Order } from "../database/entity/Order.js";
-import { orderRepo } from "../index.js";
+import { productRepo } from "../index.js";
 
 export const reduceProductQuantity = async (orders: Order[]) => {
 
     for (const order of orders) {
         for (const product of order.products) {
-            await product.modifyProduct('decreaseQuantity')
-
-
+            product.quantityInStock -= 1
+            await productRepo.save(product)
+            console.log(`Product ${product.id}'s quantity was reduced`)
         }
     }
 

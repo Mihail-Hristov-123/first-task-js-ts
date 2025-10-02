@@ -1,8 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import {
-    handleProductOperation,
-    type ProductOperation,
-} from '../services/ProductService.js'
+
 
 @Entity('product')
 export class Product {
@@ -41,7 +38,4 @@ export class Product {
         return this.quantityInStock > 0
     }
 
-    async modifyProduct(operation: ProductOperation) {
-        await handleProductOperation(operation, this)
-    }
 }

@@ -63,20 +63,6 @@ class Store {
     }
 }
 
-await Store.establishConnection()
 
-const misho = await customerRepo.findOne({ where: { id: 1 }, relations: ['cart'] })
-const productOne = await productRepo.findOneBy({ id: 1 })
-const productTwo = await productRepo.findOneBy({ id: 2 })
-
-await misho?.modifyCart('addToCart', productOne!)
-await misho?.modifyCart('addToCart', productTwo!)
-// await misho?.modifyCart('addToCart', productOne!)
-// await misho?.modifyCart('addToCart', productTwo!)
-// await misho?.modifyCart('addToCart', productOne!)
-// await misho?.modifyCart('addToCart', productTwo!)
-
-await misho?.modifyOrder('placeOrder')
-await misho?.modifyOrder('payAllOrders')
 
 export { orderRepo, customerRepo, productRepo }
