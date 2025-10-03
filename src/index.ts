@@ -1,3 +1,4 @@
+import { connectToDatabase } from './database/connection.js'
 import { Customer } from './database/entity/customer.entity.js'
 import type { Order } from './database/entity/order.entity.js'
 import { Product } from './database/entity/product.entity.js'
@@ -73,4 +74,10 @@ export class Store {
     }
 }
 
-await playDemo()
+// Welcome to the store - it is not open yet
+const store = Store.instance
+
+// Connects to the DB, and fetches and inserts the products from the provided API (if the products table is empty)
+await store.openStore()
+
+await playDemo(store)

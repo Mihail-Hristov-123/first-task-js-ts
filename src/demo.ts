@@ -1,17 +1,11 @@
 import { Store } from './index.js'
 
-export const playDemo = async () => {
+export const playDemo = async (store: Store) => {
     try {
-        // Welcome to the store - it is not open yet
-        const store = Store.instance
-
-        // Connects to the DB, and fetches and inserts the products from the provided API (if the products table is empty)
-        await store.openStore()
-
         // Creates and returns a premium customer
         const firstUser = await store.addNewCustomer(
             ' John',
-            'realEmail@gmail.com',
+            'realUniqueEmail11@gmail.com', // Please change if duplicate (an error might pop up as the email should be unique)
             2000,
             true, // Change to false if you wish to observe the regular customer behavior (no discounts and might not be able to access products that are almost sold out (#14, #10 for example))
         )
