@@ -17,7 +17,7 @@ export const limitProductAvailability = (
 
     const { hasPriority: userHasPriority } = customerInstance
 
-    if (!userHasPriority && quantityInStock <= 10) {
+    if (!userHasPriority && quantityInStock < 10) {
         throw new Error(
             `As there are only ${quantityInStock} articles left of the product with ID ${productId}, they are reserved for our premium customers`,
         )
