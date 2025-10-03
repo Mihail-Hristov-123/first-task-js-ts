@@ -11,6 +11,7 @@ import {
 import { playDemo } from './demo.js'
 import type { EntityMap, FetchableEntities } from './types/service.types.js'
 
+// Should be the only thing exposed
 export class Store {
     static #instance: Store
 
