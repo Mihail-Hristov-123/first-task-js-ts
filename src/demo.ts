@@ -3,9 +3,9 @@ import { Store } from './index.js'
 export const playDemo = async (store: Store) => {
     try {
         // Creates and returns a premium customer
-        const firstUser = await store.addNewCustomer(
+        const firstUser = await store.addNewUser(
             ' John',
-            'realUniqueEmail11@gmail.com', // Please change if duplicate (an error might pop up as the email should be unique)
+            'realUniqsueEmaila11@gmail.com', // Please change if duplicate (an error might pop up as the email should be unique)
             2000,
             true, // Change to false if you wish to observe the regular customer behavior (no discounts and might not be able to access products that are almost sold out (#14, #10 for example))
         )

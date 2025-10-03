@@ -6,9 +6,14 @@ import {
     orderRepo,
     productRepo,
 } from '../connection.js'
-import { PremiumCustomer, RegularCustomer } from '../entity/customer.entity.js'
+import {
+    Customer,
+    PremiumCustomer,
+    RegularCustomer,
+} from '../entity/customer.entity.js'
 
 import type { EntityMap, FetchableEntities } from '../../types/service.types.js'
+import type { Product } from '../entity/product.entity.js'
 
 const repoMap: {
     [K in keyof EntityMap]: Repository<EntityMap[K]>
@@ -17,8 +22,8 @@ const repoMap: {
     product: productRepo,
     order: orderRepo,
 }
-class StoreService {
-    async initializeStore() {
+export class StoreService {
+    async openStore() {
         try {
             await connectToDatabase()
 
@@ -34,7 +39,7 @@ class StoreService {
         }
     }
 
-    async createUser(
+    async addNewUser(
         name: string,
         email: string,
         balance: number,
@@ -56,7 +61,7 @@ class StoreService {
         }
     }
 
-    async searchOne<T extends FetchableEntities>(
+    async findOne<T extends FetchableEntities>(
         query: T,
         id: number,
     ): Promise<EntityMap[T] | undefined> {
@@ -68,7 +73,21 @@ class StoreService {
             return undefined
         }
     }
+    async addProductToCart(product: Product, customer: Customer) {
+        await customer.modifyCart('addToCart', product)
+    }
+
+    async removeProductFromCart(product: Product, customer: Customer) {
+        await customer.modifyCart('removeFromCart', product)
+    }
+
+    async placeOrder(customer: Customer) {
+        await customer.modifyOrder('placeOrder')
+    }
+
+    async payAllUserOrders(customer: Customer) {
+        await customer.modifyOrder('payAllOrders')
+    }
 }
 
 const storeService = new StoreService()
-export const { initializeStore, createUser, searchOne } = storeService
