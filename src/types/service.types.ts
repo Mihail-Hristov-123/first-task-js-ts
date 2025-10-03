@@ -4,7 +4,7 @@ import type { Product } from '../database/entity/product.entity.js'
 import type { OrderService } from '../database/services/customer.order.service.js'
 
 type CustomerSummary = Pick<Customer, 'id' | 'name'>
-type ProductSummary = Omit<Product, 'description'>
+type ProductSummary = Omit<Product, 'description' | 'isAvailable'>
 type OrderSummary = Pick<Order, 'id' | 'status' | 'total'> & {
     owner: CustomerSummary
     products: ProductSummary[]
@@ -12,3 +12,11 @@ type OrderSummary = Pick<Order, 'id' | 'status' | 'total'> & {
 type OrderOperation = Omit<keyof OrderService, 'getSummary'>
 
 export type { OrderSummary, ProductSummary, OrderOperation, CustomerSummary }
+
+export type FetchableEntities = 'customer' | 'product' | 'order'
+
+export type EntityMap = {
+    customer: Customer
+    product: Product
+    order: Order
+}

@@ -7,9 +7,9 @@ import { getSummary } from './database/services/customer.order.service.js'
 import {
     createUser,
     initializeStore,
+    searchOne,
 } from './database/services/store.service.js'
-
-import { fetchInstance, type FetchableEntities } from './utils/fetchInstance.js'
+import type { EntityMap, FetchableEntities } from './types/service.types.js'
 
 export class Store {
     static #instance: Store
@@ -54,10 +54,13 @@ export class Store {
         await customer.modifyOrder('payAllOrders')
     }
 
-    // returns a single entity if it is found - not type safe yet
-    async find(query: FetchableEntities, id: number) {
-        return await fetchInstance(query, id)
+    async findOne<T extends FetchableEntities>(
+        query: T,
+        id: number,
+    ): Promise<EntityMap[T] | undefined> {
+        return await searchOne(query, id)
     }
+
     getOrderSummary(order: Order) {
         if (!order.owner) {
             console.warn(
@@ -75,12 +78,12 @@ await store.openStore()
 
 const testUser = await store.addNewCustomer(
     'Michael',
-    'misho@gsmsasisl.cosm',
+    'misho@gsmssasisls.cosm',
     2000,
     false,
 )
-const prodOne = await productRepo.findOneBy({ id: 1 })
-const prodTwo = await productRepo.findOneBy({ id: 2 })
+const prodOne = await store.findOne('product', 1)
+const prodTwo = await store.findOne('product', 2)
 await store.addProductToCart(prodOne!, testUser!)
 await store.addProductToCart(prodTwo!, testUser!)
 

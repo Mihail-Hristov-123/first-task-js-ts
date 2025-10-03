@@ -80,12 +80,11 @@ export class OrderService {
                 name: order.owner.name,
             },
             products: order.products.map(
-                ({ id, name, price, quantityInStock, isAvailable }) => ({
+                ({ id, name, price, quantityInStock }) => ({
                     id,
                     name,
                     price,
                     quantityInStock,
-                    isAvailable,
                 }),
             ),
         }

@@ -1,11 +1,27 @@
+import type { Repository } from 'typeorm'
 import { initializeProducts } from '../../utils/initializeProducts.js'
-import { connectToDatabase, customerRepo, productRepo } from '../connection.js'
+import {
+    connectToDatabase,
+    customerRepo,
+    orderRepo,
+    productRepo,
+} from '../connection.js'
 import { PremiumCustomer, RegularCustomer } from '../entity/customer.entity.js'
 
+import type { EntityMap, FetchableEntities } from '../../types/service.types.js'
+
+const repoMap: {
+    [K in keyof EntityMap]: Repository<EntityMap[K]>
+} = {
+    customer: customerRepo,
+    product: productRepo,
+    order: orderRepo,
+}
 class StoreService {
     async initializeStore() {
         try {
             await connectToDatabase()
+
             const alreadyStocked = Boolean(await productRepo.count())
             if (!alreadyStocked) {
                 await initializeProducts()
@@ -39,8 +55,20 @@ class StoreService {
             )
         }
     }
+
+    async searchOne<T extends FetchableEntities>(
+        query: T,
+        id: number,
+    ): Promise<EntityMap[T] | undefined> {
+        try {
+            const result = await repoMap[query].findOneByOrFail({ id } as any)
+            return result
+        } catch (error) {
+            console.error(`Error occurred during search: ${error}`)
+            return undefined
+        }
+    }
 }
 
 const storeService = new StoreService()
-
-export const { initializeStore, createUser } = storeService
+export const { initializeStore, createUser, searchOne } = storeService
