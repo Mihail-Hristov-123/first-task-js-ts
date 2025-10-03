@@ -24,7 +24,17 @@ export class Order {
     status: Status
 
     @Column('real', { nullable: true })
-    total: number
+    private _total: number
+
+    get total() {
+        return this._total
+    }
+    set total(newTotal: number) {
+        if (newTotal < 0) {
+            throw new Error('Order total cannot be negative')
+        }
+        this._total = newTotal
+    }
 
     @ManyToOne(() => Customer, (customer) => customer.orders)
     owner: Customer

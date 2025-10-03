@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-
+import type { ProductFields, RawProduct } from '../../types/entity.types.js'
 
 @Entity('product')
 export class Product {
@@ -7,7 +7,7 @@ export class Product {
     id: number
 
     @Column()
-    name: string
+    title: string
 
     @Column()
     description: string
@@ -19,23 +19,27 @@ export class Product {
     quantityInStock: number
 
     constructor(
-        name: string,
+        title: string,
         description: string,
         price: number,
         quantityInStock: number,
     ) {
-        this.name = name
+        this.title = title
         this.description = description
         this.price = price
         this.quantityInStock = quantityInStock
     }
 
-    static isProduct(potentialProduct: unknown): potentialProduct is Product {
-        return potentialProduct instanceof Product
+    static isProduct(obj: RawProduct): obj is ProductFields {
+        return (
+            obj &&
+            typeof obj.title === 'string' &&
+            typeof obj.description === 'string' &&
+            typeof obj.price === 'number'
+        )
     }
 
     isAvailable() {
         return this.quantityInStock > 0
     }
-
 }

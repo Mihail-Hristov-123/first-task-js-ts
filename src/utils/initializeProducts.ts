@@ -21,9 +21,13 @@ export const initializeProducts = async () => {
         const newProducts = await fetchProducts()
         const productsToInitialize: Product[] = []
         for (const article of newProducts) {
-            const { description, title: name, price } = article
+            if (!Product.isProduct(article)) {
+                console.warn('Invalid product found and skipped:', article)
+                continue
+            }
+            const { description, title, price } = article
             const newArticle = new Product(
-                name,
+                title,
                 description,
                 price,
                 generateRandomQuantity(),

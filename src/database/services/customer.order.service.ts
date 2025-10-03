@@ -80,9 +80,9 @@ export class OrderService {
                 name: order.owner.name,
             },
             products: order.products.map(
-                ({ id, name, price, quantityInStock }) => ({
+                ({ id, title, price, quantityInStock }) => ({
                     id,
-                    name,
+                    title,
                     price,
                     quantityInStock,
                 }),
