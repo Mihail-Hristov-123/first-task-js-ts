@@ -5,9 +5,9 @@ export const playDemo = async (store: Store) => {
         // Creates and returns a premium customer
         const firstUser = await store.addNewUser(
             ' John',
-            'uniqueEmail', // Please change if duplicate (an error might pop up as the email should be unique)
+            'uniqueEmailOne@gmail.com', // Please change if duplicate (an error might pop up as the email should be unique)
             2000,
-            true, // Change to false if you wish to observe the regular customer behavior (no discounts and might not be able to access products that are almost sold out (#14, #10 for example))
+            true, // Change to false if you wish to observe the regular customer behavior (no discounts and might not be able to access products that are almost sold out)
         )
 
         if (!firstUser) {

@@ -22,6 +22,4 @@ export const calculateDiscountedTotal = (
         `A discount of $${discountAmount} has been applied due to premium membership`,
     )
     return ordersTotal - discountAmount
-
-    // return shouldReceiveDiscount ? ordersTotal * (1 - DISCOUNT_COEFFICIENT) : ordersTotal
 }

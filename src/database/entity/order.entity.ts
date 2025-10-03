@@ -31,8 +31,7 @@ export class Order {
     }
     set total(newTotal: number) {
         if (newTotal < 0) {
-            console.warn("Order total can't be negative")
-            return
+            throw new Error('Order total cannot be negative')
         }
         this._total = newTotal
     }

@@ -33,7 +33,18 @@ abstract class Customer {
     email: string
 
     @Column('real')
-    balance: number
+    private _balance: number
+
+    get balance() {
+        return this._balance
+    }
+
+    set balance(newBalance: number) {
+        if (newBalance < 0) {
+            throw new Error('User balance cannot be negative')
+        }
+        this._balance = newBalance
+    }
 
     @ManyToMany(() => Product, { eager: true })
     @JoinTable()
