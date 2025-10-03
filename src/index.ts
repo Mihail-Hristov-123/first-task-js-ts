@@ -1,4 +1,3 @@
-import { orderRepo, productRepo } from './database/connection.js'
 import { Customer } from './database/entity/customer.entity.js'
 import type { Order } from './database/entity/order.entity.js'
 import { Product } from './database/entity/product.entity.js'
@@ -9,6 +8,7 @@ import {
     initializeStore,
     searchOne,
 } from './database/services/store.service.js'
+import { playDemo } from './demo.js'
 import type { EntityMap, FetchableEntities } from './types/service.types.js'
 
 export class Store {
@@ -72,25 +72,4 @@ export class Store {
     }
 }
 
-const store = Store.instance
-
-await store.openStore()
-
-const testUser = await store.addNewCustomer(
-    'Michael',
-    'misho@gsmssasisls.cosm',
-    2000,
-    false,
-)
-const prodOne = await store.findOne('product', 1)
-const prodTwo = await store.findOne('product', 2)
-await store.addProductToCart(prodOne!, testUser!)
-await store.addProductToCart(prodTwo!, testUser!)
-
-await store.placeOrder(testUser!)
-const order = await orderRepo.findOne({
-    where: { id: 1 },
-    relations: ['owner', 'products'],
-})
-console.log(getSummary(order!))
-await store.payAllUserOrders(testUser!)
+await playDemo()
