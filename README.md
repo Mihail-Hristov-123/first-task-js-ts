@@ -18,3 +18,4 @@
 - Please include the connection string (will be provided in task submission) in the env file - I am using a remote DB
 - index.ts is the entry point of the app, npm run start will handle compilation and the demo
 - Please check out demo.ts for explanations of what is currently happening and clarifications of the code
+- If you run the app more than once, make sure to change the email of the created customer, as it should be unique 
